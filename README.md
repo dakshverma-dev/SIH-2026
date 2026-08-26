@@ -1,5 +1,7 @@
 # Plan2Reality — Trusted Execution Intelligence
 
+> 🚧 **Status: Work in Progress (SIH 2026 Prototype)** — Actively developing AI-driven construction schedule intelligence, automatic DPR extraction, RLS-enforced governance, and critical-path delay simulation.
+
 Full-stack prototype for SIH 2026 PS26122, now on a **real Supabase Postgres backend
 with Row Level Security enforced on every table**. Converts messy field reality (DPR
 text) into verified, schedule-linked (L5/L6) project truth, then reasons about

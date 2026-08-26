@@ -56,7 +56,13 @@ export default function Shell({
       </aside>
       <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
         <header style={{ borderBottom: "1px solid var(--border)", padding: "12px 24px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div style={{ fontSize: 12, color: "var(--muted)" }}>EPC Package · Demo Data</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontSize: 12, color: "var(--muted)" }}>EPC Package · Demo Data</span>
+            <span style={{ fontSize: 11, background: "rgba(245, 158, 11, 0.12)", color: "#f59e0b", border: "1px solid rgba(245, 158, 11, 0.3)", padding: "2px 8px", borderRadius: 12, fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 4 }}>
+              <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#f59e0b", display: "inline-block" }}></span>
+              WORK IN PROGRESS · SIH 2026
+            </span>
+          </div>
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             <span style={{ fontSize: 12.5 }}>{user.name}</span>
             <span className="badge badge-info">{user.role.replace("_", " ")}</span>
