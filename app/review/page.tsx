@@ -1,76 +1,69 @@
-import { redirect } from "next/navigation";
-import { getSession } from "@/lib/auth";
-import { createClient } from "@/lib/supabase/server";
-import { getDefaultProject } from "@/lib/project";
-import Shell from "@/components/Shell";
-import ReviewCard from "./ReviewCard";
+'use client';
 
-export default async function ReviewPage() {
-  const session = await getSession();
-  if (!session) redirect("/login");
-  const supabase = await createClient();
-  const project = await getDefaultProject(supabase);
-  if (!project) return null;
+import { useEffect, useState } from 'react';
+import { useReviewStore } from '@/lib/store/review-store';
+import { getExecutionEvents } from '@/lib/api/updates';
+import { getFieldUpdates } from '@/lib/api/updates';
+import { ReviewRow } from '@/components/review/ReviewRow';
+import { Skeleton } from '@/components/shared/Skeleton';
+import { ErrorState } from '@/components/shared/ErrorState';
+import type { ExecutionEvent, FieldUpdate } from '@/lib/types';
 
-  const { data: matchesData } = await supabase
-    .from("activity_matches")
-    .select("*, field_events(evidence_span, activity_description, engineering_tag, location, discipline, progress)")
-    .eq("project_id", project.id)
-    .order("created_at", { ascending: false });
+export default function ReviewQueue() {
+  const { matches, loading, error, accept, reject, reassign } = useReviewStore();
+  const [events, setEvents] = useState<ExecutionEvent[] | null>(null);
+  const [updates, setUpdates] = useState<FieldUpdate[] | null>(null);
+  const [joinError, setJoinError] = useState<string | null>(null);
 
-  const matches = matchesData || [];
+  useEffect(() => {
+    Promise.all([getExecutionEvents(), getFieldUpdates()])
+      .then(([e, u]) => {
+        setEvents(e);
+        setUpdates(u);
+      })
+      .catch(() => setJoinError('Failed to load field data.'));
+  }, []);
 
-  const enriched = [];
-  for (const m of matches) {
-    const { data: candidatesData } = await supabase
-      .from("match_candidates")
-      .select("*, schedule_activities(activity_id, description, wbs, discipline, location, engineering_tag)")
-      .eq("field_event_id", m.field_event_id)
-      .order("rank", { ascending: true });
-
-    const candidates = (candidatesData || []).map((c) => ({
-      id: c.id,
-      score: c.score,
-      reasons: c.reasons,
-      activity_id: c.activity_id,
-      sched_activity_id: c.schedule_activities?.activity_id,
-      sched_description: c.schedule_activities?.description,
-      wbs: c.schedule_activities?.wbs,
-      discipline: c.schedule_activities?.discipline,
-      location: c.schedule_activities?.location,
-    }));
-
-    enriched.push({
-      ...m,
-      evidence_span: m.field_events?.evidence_span,
-      candidates,
-    });
+  if (error || joinError) {
+    return (
+      <main className="mx-auto max-w-4xl p-10">
+        <ErrorState message={error ?? joinError ?? 'Unknown error'} />
+      </main>
+    );
   }
 
-  const pending = enriched.filter((m) => m.status === "PENDING");
-  const decided = enriched.filter((m) => m.status !== "PENDING");
+  if (loading || !events || !updates) {
+    return (
+      <main className="mx-auto max-w-4xl space-y-4 p-10">
+        <Skeleton variant="row" count={5} />
+      </main>
+    );
+  }
+
+  const queue = matches
+    .filter((m) => m.route === 'review' || m.route === 'unmatched')
+    .sort((a, b) => a.confidence - b.confidence);
 
   return (
-    <Shell active="/review" user={session} projectName={project.name}>
-      <h1 style={{ fontSize: 20, fontWeight: 600, marginBottom: 4 }}>Review Queue</h1>
-      <p style={{ color: "var(--muted)", fontSize: 13, marginBottom: 18 }}>
-        {pending.length} pending · High confidence auto-eligible for approval, medium requires review, low/unmatched never force a match.
-      </p>
-
-      {pending.length === 0 && decided.length === 0 && (
-        <div className="p2r-card" style={{ padding: 24, color: "var(--muted)", fontSize: 13 }}>
-          No matches yet. Submit a field report to generate one.
-        </div>
-      )}
-
-      {pending.map((m) => <ReviewCard key={m.id} match={m} canReview={session.role !== "VIEWER" && session.role !== "SUPERVISOR"} />)}
-
-      {decided.length > 0 && (
-        <>
-          <div style={{ fontWeight: 600, margin: "20px 0 10px" }}>Decided</div>
-          {decided.map((m) => <ReviewCard key={m.id} match={m} canReview={false} />)}
-        </>
-      )}
-    </Shell>
+    <main className="mx-auto max-w-4xl space-y-7 p-10">
+      <h1 className="font-serif text-3xl font-light text-aged-sepia">Review queue</h1>
+      <div className="flex flex-col gap-4">
+        {queue.map((match) => {
+          const event = events.find((e) => e.id === match.executionEventId);
+          const fieldUpdate = updates.find((u) => u.id === event?.fieldUpdateId);
+          return (
+            <ReviewRow
+              key={match.id}
+              match={match}
+              event={event}
+              fieldUpdate={fieldUpdate}
+              onAccept={accept}
+              onReject={reject}
+              onReassign={reassign}
+            />
+          );
+        })}
+      </div>
+    </main>
   );
 }
