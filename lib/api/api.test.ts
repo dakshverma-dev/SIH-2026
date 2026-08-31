@@ -24,8 +24,8 @@ describe('data-access layer', () => {
   });
 
   it('getActivity returns a matching activity for a real ID', async () => {
-    const activity = await getActivity('act-1');
-    expect(activity?.id).toBe('act-1');
+    const activity = await getActivity('PIP-321');
+    expect(activity?.id).toBe('PIP-321');
   });
 
   it('getActivity returns null for an unknown ID', async () => {

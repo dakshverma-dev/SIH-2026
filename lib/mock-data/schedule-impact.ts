@@ -1,8 +1,8 @@
 import type { ScheduleImpact } from '../types';
 
 export const scheduleImpact: ScheduleImpact = {
-  affectedActivityIds: ['act-8', 'act-10', 'act-13', 'act-14', 'act-16', 'act-18', 'act-20'],
+  affectedActivityIds: ['PIP-324', 'PIP-326', 'PIP-330', 'PIP-331', 'QA-401', 'QA-402'],
   criticalPathMoved: true,
-  revisedCompletionDate: '2026-09-25',
-  delayDays: 7,
+  revisedCompletionDate: '2026-06-24',
+  delayDays: 5,
 };

@@ -1,0 +1,915 @@
+
+> plan2reality-frontend@0.1.0 test
+> vitest run --reporter=verbose
+
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - ESM syntax in a file loaded as CommonJS (vitest.config.ts:1:1). Use a `.mjs` extension or set `"type": "module"` in the closest package.json
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.11 [39m[90m/Users/chetnanagar/Desktop/SIH/SIH-2026[39m
+
+ [31m×[39m lib/mock-data/activities.test.ts[2m > [22mscheduleActivities fixture[2m > [22mhas exactly 20 activities[32m 3[2mms[22m[39m
+[31m   → expected [ { id: 'PIP-321', …(8) }, …(14) ] to have a length of 20 but got 15[39m
+ [31m×[39m lib/mock-data/activities.test.ts[2m > [22mscheduleActivities fixture[2m > [22mhas unique IDs[32m 1[2mms[22m[39m
+[31m   → expected 15 to be 20 // Object.is equality[39m
+ [32m✓[39m lib/mock-data/activities.test.ts[2m > [22mscheduleActivities fixture[2m > [22mevery dependency references a real activity ID[32m 0[2mms[22m[39m
+ [31m×[39m lib/mock-data/activities.test.ts[2m > [22mscheduleActivities fixture[2m > [22mhas at least one critical-path chain of 4+ activities[32m 0[2mms[22m[39m
+[31m   → expected 0 to be greater than or equal to 4[39m
+ [32m✓[39m lib/mock-data/activities.test.ts[2m > [22mscheduleActivities fixture[2m > [22mhas at least one non-critical activity with dependencies (parallel branch)[32m 0[2mms[22m[39m
+ [31m×[39m lib/mock-data/activities.test.ts[2m > [22mscheduleActivities fixture[2m > [22mevery activity has a WBS code and positive duration[32m 0[2mms[22m[39m
+[31m   → expected 0 to be greater than 0[39m
+ [32m✓[39m lib/mock-data/impact-and-recovery.test.ts[2m > [22mscheduleImpact fixture[2m > [22mreferences real activity IDs[32m 1[2mms[22m[39m
+ [31m×[39m lib/mock-data/impact-and-recovery.test.ts[2m > [22mscheduleImpact fixture[2m > [22mreports a positive delay consistent with criticalPathMoved[32m 2[2mms[22m[39m
+[31m   → expected 0 to be greater than 0[39m
+ [32m✓[39m lib/mock-data/impact-and-recovery.test.ts[2m > [22mrecoveryOptions fixture[2m > [22mhas at least 3 options[32m 0[2mms[22m[39m
+ [32m✓[39m lib/mock-data/impact-and-recovery.test.ts[2m > [22mrecoveryOptions fixture[2m > [22mevery option has a non-empty description and tradeoff note[32m 0[2mms[22m[39m
+ [32m✓[39m lib/mock-data/pipeline-fixtures.test.ts[2m > [22mpipeline fixtures referential integrity[2m > [22mevery ExecutionEvent references a real FieldUpdate[32m 1[2mms[22m[39m
+ [32m✓[39m lib/mock-data/pipeline-fixtures.test.ts[2m > [22mpipeline fixtures referential integrity[2m > [22mevery MatchResult references a real ExecutionEvent[32m 0[2mms[22m[39m
+ [32m✓[39m lib/mock-data/pipeline-fixtures.test.ts[2m > [22mpipeline fixtures referential integrity[2m > [22mevery non-null matchedActivityId references a real ScheduleActivity[32m 0[2mms[22m[39m
+ [32m✓[39m lib/mock-data/pipeline-fixtures.test.ts[2m > [22mpipeline fixtures referential integrity[2m > [22munmatched routes always have a null matchedActivityId[32m 0[2mms[22m[39m
+ [32m✓[39m lib/mock-data/pipeline-fixtures.test.ts[2m > [22mpipeline fixtures referential integrity[2m > [22mincludes a contradiction case (progress went backwards)[32m 0[2mms[22m[39m
+ [31m×[39m lib/mock-data/pipeline-fixtures.test.ts[2m > [22mpipeline fixtures referential integrity[2m > [22mincludes an update with no matched identifiers (semantic+context only)[32m 2[2mms[22m[39m
+[31m   → expected false to be true // Object.is equality[39m
+ [31m×[39m lib/mock-data/pipeline-fixtures.test.ts[2m > [22mpipeline fixtures referential integrity[2m > [22mincludes a genuinely unmatched activity[32m 0[2mms[22m[39m
+[31m   → expected 0 to be greater than or equal to 1[39m
+ [32m✓[39m lib/mock-data/pipeline-fixtures.test.ts[2m > [22mpipeline fixtures referential integrity[2m > [22mincludes multiple clean high-confidence auto_post cases[32m 0[2mms[22m[39m
+ [31m×[39m lib/mock-data/pipeline-fixtures.test.ts[2m > [22mpipeline fixtures referential integrity[2m > [22mincludes two updates describing the same work differently, both matching the same activity[32m 0[2mms[22m[39m
+[31m   → expected false to be true // Object.is equality[39m
+ [32m✓[39m lib/mock-data/pipeline-fixtures.test.ts[2m > [22mpipeline fixtures referential integrity[2m > [22mincludes a date-inconsistency case flagged in contextChecks.timing[32m 0[2mms[22m[39m
+ [32m✓[39m components/planner/CountsStrip.test.tsx[2m > [22mCountsStrip[2m > [22mshows correct counts per route[32m 30[2mms[22m[39m
+ [32m✓[39m components/planner/ActivitiesTable.test.tsx[2m > [22mActivitiesTable[2m > [22mrenders every activity WBS code and description[32m 34[2mms[22m[39m
+ [32m✓[39m components/planner/ActivitiesTable.test.tsx[2m > [22mActivitiesTable[2m > [22mmarks critical-path rows distinctly via data attribute[32m 3[2mms[22m[39m
+ [32m✓[39m components/evidence/ReasonsBreakdown.test.tsx[2m > [22mReasonsBreakdown[2m > [22mrenders identifiers matched[32m 26[2mms[22m[39m
+ [32m✓[39m components/evidence/ReasonsBreakdown.test.tsx[2m > [22mReasonsBreakdown[2m > [22mrenders the semantic similarity score[32m 4[2mms[22m[39m
+ [32m✓[39m components/evidence/ReasonsBreakdown.test.tsx[2m > [22mReasonsBreakdown[2m > [22mrenders a failed timing check distinctly[32m 6[2mms[22m[39m
+ [32m✓[39m components/evidence/ReasonsBreakdown.test.tsx[2m > [22mReasonsBreakdown[2m > [22mrenders contradiction warnings when present[32m 4[2mms[22m[39m
+[90mstderr[2m | lib/store/review-store.test.tsx[2m > [22m[2mreview-store[2m > [22m[2maccept sets route to auto_post
+[22m[39mAn update to ReviewStoreProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ [32m✓[39m components/shared/badges.test.tsx[2m > [22mConfidenceBadge[2m > [22mrenders the confidence as a percentage[32m 20[2mms[22m[39m
+ [32m✓[39m components/shared/badges.test.tsx[2m > [22mRouteBadge[2m > [22mrenders auto_post as "Auto-posted"[32m 2[2mms[22m[39m
+ [32m✓[39m components/shared/badges.test.tsx[2m > [22mRouteBadge[2m > [22mrenders review as "Needs review"[32m 2[2mms[22m[39m
+ [32m✓[39m components/shared/badges.test.tsx[2m > [22mRouteBadge[2m > [22mrenders unmatched as "Unmatched"[32m 1[2mms[22m[39m
+ [32m✓[39m components/shared/badges.test.tsx[2m > [22mSkeleton[2m > [22mrenders the requested count of row skeletons[32m 5[2mms[22m[39m
+ [32m✓[39m components/shared/badges.test.tsx[2m > [22mErrorState[2m > [22mrenders the provided message[32m 1[2mms[22m[39m
+ [32m✓[39m components/review/ReviewRow.test.tsx[2m > [22mReviewRow[2m > [22mrenders the verbatim field text[32m 24[2mms[22m[39m
+ [32m✓[39m components/review/ReviewRow.test.tsx[2m > [22mReviewRow[2m > [22mlinks to the evidence view for this match[32m 74[2mms[22m[39m
+ [32m✓[39m components/review/ReviewRow.test.tsx[2m > [22mReviewRow[2m > [22mshows a "no alternative matches" message when candidates is undefined[32m 2[2mms[22m[39m
+ [32m✓[39m lib/mock-data/benchmark-events.test.ts[2m > [22mbenchmarkEvents fixture (Preethy Benchmark_Events gold standard)[2m > [22mhas exactly 30 cases (B001-B030)[32m 1[2mms[22m[39m
+ [32m✓[39m lib/mock-data/benchmark-events.test.ts[2m > [22mbenchmarkEvents fixture (Preethy Benchmark_Events gold standard)[2m > [22mhas unique case IDs[32m 0[2mms[22m[39m
+ [32m✓[39m lib/mock-data/benchmark-events.test.ts[2m > [22mbenchmarkEvents fixture (Preethy Benchmark_Events gold standard)[2m > [22mevery MATCH case has an expectedActivityId that exists in scheduleActivities[32m 0[2mms[22m[39m
+ [32m✓[39m lib/mock-data/benchmark-events.test.ts[2m > [22mbenchmarkEvents fixture (Preethy Benchmark_Events gold standard)[2m > [22mevery UNMATCHED case has a null expectedActivityId[32m 0[2mms[22m[39m
+ [32m✓[39m lib/mock-data/benchmark-events.test.ts[2m > [22mbenchmarkEvents fixture (Preethy Benchmark_Events gold standard)[2m > [22mevery case has a non-empty field report and domain rationale[32m 0[2mms[22m[39m
+ [32m✓[39m lib/mock-data/benchmark-events.test.ts[2m > [22mbenchmarkEvents fixture (Preethy Benchmark_Events gold standard)[2m > [22mdifficulty is always Easy, Medium, or Hard[32m 0[2mms[22m[39m
+ [32m✓[39m lib/mock-data/benchmark-events.test.ts[2m > [22mbenchmarkEvents fixture (Preethy Benchmark_Events gold standard)[2m > [22mtestSplit is always Train or Test[32m 0[2mms[22m[39m
+ [32m✓[39m lib/mock-data/benchmark-events.test.ts[2m > [22mbenchmarkEvents fixture (Preethy Benchmark_Events gold standard)[2m > [22mincludes at least 5 UNMATCHED cases (negative examples matter)[32m 0[2mms[22m[39m
+ [32m✓[39m lib/mock-data/benchmark-events.test.ts[2m > [22mbenchmarkEvents fixture (Preethy Benchmark_Events gold standard)[2m > [22mincludes at least 3 REVIEW cases (ambiguous/missing-context examples)[32m 0[2mms[22m[39m
+ [32m✓[39m lib/mock-data/benchmark-events.test.ts[2m > [22mbenchmarkEvents fixture (Preethy Benchmark_Events gold standard)[2m > [22mincludes at least 5 Hard difficulty cases[32m 0[2mms[22m[39m
+ [32m✓[39m lib/mock-data/benchmark-events.test.ts[2m > [22mbenchmarkEvents fixture (Preethy Benchmark_Events gold standard)[2m > [22mincludes both Train and Test split cases[32m 0[2mms[22m[39m
+ [32m✓[39m lib/mock-data/benchmark-events.test.ts[2m > [22mbenchmarkEvents fixture (Preethy Benchmark_Events gold standard)[2m > [22mcovers near-duplicate disambiguation by location, asset, and activity type[32m 0[2mms[22m[39m
+ [32m✓[39m lib/types.test.ts[2m > [22mtype contract shapes[2m > [22maccepts a minimal valid FieldUpdate[32m 1[2mms[22m[39m
+ [32m✓[39m lib/types.test.ts[2m > [22mtype contract shapes[2m > [22maccepts an ExecutionEvent with optional fields omitted[32m 0[2mms[22m[39m
+ [32m✓[39m lib/types.test.ts[2m > [22mtype contract shapes[2m > [22maccepts a MatchResult with null matchedActivityId (unmatched)[32m 0[2mms[22m[39m
+ [32m✓[39m lib/types.test.ts[2m > [22mtype contract shapes[2m > [22maccepts a ScheduleActivity[32m 0[2mms[22m[39m
+ [32m✓[39m lib/types.test.ts[2m > [22mtype contract shapes[2m > [22maccepts a ScheduleImpact[32m 0[2mms[22m[39m
+ [32m✓[39m lib/types.test.ts[2m > [22mtype contract shapes[2m > [22maccepts a RecoveryOption[32m 0[2mms[22m[39m
+ [32m✓[39m components/evidence/EvidenceText.test.tsx[2m > [22mEvidenceText[2m > [22mhighlights the excerpt when present[32m 13[2mms[22m[39m
+ [32m✓[39m components/evidence/EvidenceText.test.tsx[2m > [22mEvidenceText[2m > [22mshows a fallback note when excerpt is missing[32m 3[2mms[22m[39m
+ [32m✓[39m lib/api/api.test.ts[2m > [22mdata-access layer[2m > [22mgetFieldUpdates returns a promise resolving to an array[32m 1[2mms[22m[39m
+ [32m✓[39m lib/api/api.test.ts[2m > [22mdata-access layer[2m > [22mgetExecutionEvents resolves to an array[32m 0[2mms[22m[39m
+ [32m✓[39m lib/api/api.test.ts[2m > [22mdata-access layer[2m > [22mgetActivities resolves to exactly 15 activities[32m 0[2mms[22m[39m
+ [32m✓[39m lib/api/api.test.ts[2m > [22mdata-access layer[2m > [22mgetActivity returns a matching activity for a real ID[32m 0[2mms[22m[39m
+ [32m✓[39m lib/api/api.test.ts[2m > [22mdata-access layer[2m > [22mgetActivity returns null for an unknown ID[32m 0[2mms[22m[39m
+ [32m✓[39m lib/api/api.test.ts[2m > [22mdata-access layer[2m > [22mgetMatches resolves to an array[32m 0[2mms[22m[39m
+ [32m✓[39m lib/api/api.test.ts[2m > [22mdata-access layer[2m > [22mgetMatch returns a matching result for a real ID[32m 0[2mms[22m[39m
+ [32m✓[39m lib/api/api.test.ts[2m > [22mdata-access layer[2m > [22mgetMatch returns null for an unknown ID[32m 0[2mms[22m[39m
+ [32m✓[39m lib/api/api.test.ts[2m > [22mdata-access layer[2m > [22mgetScheduleImpact resolves to a single ScheduleImpact object[32m 0[2mms[22m[39m
+ [32m✓[39m lib/api/api.test.ts[2m > [22mdata-access layer[2m > [22mgetRecoveryOptions resolves to an array of at least 3[32m 0[2mms[22m[39m
+[90mstderr[2m | lib/store/review-store.test.tsx[2m > [22m[2mreview-store[2m > [22m[2mreassign updates matchedActivityId
+[22m[39mAn update to ReviewStoreProvider inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ [31m×[39m lib/store/review-store.test.tsx[2m > [22mreview-store[2m > [22maccept sets route to auto_post[33m 1037[2mms[22m[39m
+[31m   → Unable to find an element by: [data-testid="match-m-8"]
+
+Ignored nodes: comments, script, style
+[36m<body>[31m
+  [36m<div>[31m
+    [36m<div>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"count"[31m
+      [36m>[31m
+        [0m9[0m
+      [36m</div>[31m
+      [36m<button>[31m
+        [0maccept[0m
+      [36m</button>[31m
+      [36m<button>[31m
+        [0mreject[0m
+      [36m</button>[31m
+      [36m<button>[31m
+        [0mreassign[0m
+      [36m</button>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"match-m-PIP-322"[31m
+      [36m>[31m
+        [0mauto_post[0m
+        [0m / [0m
+        [0mPIP-322[0m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"match-m-CIV-112"[31m
+      [36m>[31m
+        [0mauto_post[0m
+        [0m / [0m
+        [0mCIV-112[0m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"match-m-ELE-341"[31m
+      [36m>[31m
+        [0mauto_post[0m
+        [0m / [0m
+        [0mELE-341[0m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"match-m-13"[31m
+      [36m>[31m
+        [0mreview[0m
+        [0m / [0m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"match-m-14"[31m
+      [36m>[31m
+        [0mreview[0m
+        [0m / [0m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"match-m-15"[31m
+      [36m>[31m
+        [0mreview[0m
+        [0m / [0m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"match-m-16"[31m
+      [36m>[31m
+        [0mreview[0m
+        [0m / [0m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"match-m-17"[31m
+      [36m>[31m
+        [0mreview[0m
+        [0m / [0m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"match-m-18"[31m
+      [36m>[31m
+        [0mreview[0m
+        [0m / [0m
+      [36m</div>[31m
+    [36m</div>[31m
+  [36m</div>[31m
+[36m</body>[31m
+
+Ignored nodes: comments, script, style
+[36m<html>[31m
+  [36m<head />[31m
+  [36m<body>[31m
+    [36m<div>[31m
+      [36m<div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"count"[31m
+        [36m>[31m
+          [0m9[0m
+        [36m</div>[31m
+        [36m<button>[31m
+          [0maccept[0m
+        [36m</button>[31m
+        [36m<button>[31m
+          [0mreject[0m
+        [36m</button>[31m
+        [36m<button>[31m
+          [0mreassign[0m
+        [36m</button>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"match-m-PIP-322"[31m
+        [36m>[31m
+          [0mauto_post[0m
+          [0m / [0m
+          [0mPIP-322[0m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"match-m-CIV-112"[31m
+        [36m>[31m
+          [0mauto_post[0m
+          [0m / [0m
+          [0mCIV-112[0m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"match-m-ELE-341"[31m
+        [36m>[31m
+          [0mauto_post[0m
+          [0m / [0m
+          [0mELE-341[0m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"match-m-13"[31m
+        [36m>[31m
+          [0mreview[0m
+          [0m / [0m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"match-m-14"[31m
+        [36m>[31m
+          [0mreview[0m
+          [0m / [0m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"match-m-15"[31m
+        [36m>[31m
+          [0mreview[0m
+          [0m / [0m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"match-m-16"[31m
+        [36m>[31m
+          [0mreview[0m
+          [0m / [0m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"match-m-17"[31m
+        [36m>[31m
+          [0mreview[0m
+          [0m / [0m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"match-m-18"[31m
+        [36m>[31m
+          [0mreview[0m
+          [0m / [0m
+        [36m</div>[31m
+      [36m</div>[31m
+    [36m</div>[31m
+  [36m</body>[31m
+[36m</html>[31m[39m
+ [31m×[39m lib/store/review-store.test.tsx[2m > [22mreview-store[2m > [22mreassign updates matchedActivityId[33m 1013[2mms[22m[39m
+[31m   → Unable to find an element by: [data-testid="match-m-8"]
+
+Ignored nodes: comments, script, style
+[36m<body>[31m
+  [36m<div>[31m
+    [36m<div>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"count"[31m
+      [36m>[31m
+        [0m9[0m
+      [36m</div>[31m
+      [36m<button>[31m
+        [0maccept[0m
+      [36m</button>[31m
+      [36m<button>[31m
+        [0mreject[0m
+      [36m</button>[31m
+      [36m<button>[31m
+        [0mreassign[0m
+      [36m</button>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"match-m-PIP-322"[31m
+      [36m>[31m
+        [0mauto_post[0m
+        [0m / [0m
+        [0mPIP-322[0m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"match-m-CIV-112"[31m
+      [36m>[31m
+        [0mauto_post[0m
+        [0m / [0m
+        [0mCIV-112[0m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"match-m-ELE-341"[31m
+      [36m>[31m
+        [0mauto_post[0m
+        [0m / [0m
+        [0mELE-341[0m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"match-m-13"[31m
+      [36m>[31m
+        [0mreview[0m
+        [0m / [0m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"match-m-14"[31m
+      [36m>[31m
+        [0mreview[0m
+        [0m / [0m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"match-m-15"[31m
+      [36m>[31m
+        [0mreview[0m
+        [0m / [0m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"match-m-16"[31m
+      [36m>[31m
+        [0mreview[0m
+        [0m / [0m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"match-m-17"[31m
+      [36m>[31m
+        [0mreview[0m
+        [0m / [0m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"match-m-18"[31m
+      [36m>[31m
+        [0mreview[0m
+        [0m / [0m
+      [36m</div>[31m
+    [36m</div>[31m
+  [36m</div>[31m
+[36m</body>[31m
+
+Ignored nodes: comments, script, style
+[36m<html>[31m
+  [36m<head />[31m
+  [36m<body>[31m
+    [36m<div>[31m
+      [36m<div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"count"[31m
+        [36m>[31m
+          [0m9[0m
+        [36m</div>[31m
+        [36m<button>[31m
+          [0maccept[0m
+        [36m</button>[31m
+        [36m<button>[31m
+          [0mreject[0m
+        [36m</button>[31m
+        [36m<button>[31m
+          [0mreassign[0m
+        [36m</button>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"match-m-PIP-322"[31m
+        [36m>[31m
+          [0mauto_post[0m
+          [0m / [0m
+          [0mPIP-322[0m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"match-m-CIV-112"[31m
+        [36m>[31m
+          [0mauto_post[0m
+          [0m / [0m
+          [0mCIV-112[0m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"match-m-ELE-341"[31m
+        [36m>[31m
+          [0mauto_post[0m
+          [0m / [0m
+          [0mELE-341[0m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"match-m-13"[31m
+        [36m>[31m
+          [0mreview[0m
+          [0m / [0m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"match-m-14"[31m
+        [36m>[31m
+          [0mreview[0m
+          [0m / [0m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"match-m-15"[31m
+        [36m>[31m
+          [0mreview[0m
+          [0m / [0m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"match-m-16"[31m
+        [36m>[31m
+          [0mreview[0m
+          [0m / [0m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"match-m-17"[31m
+        [36m>[31m
+          [0mreview[0m
+          [0m / [0m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"match-m-18"[31m
+        [36m>[31m
+          [0mreview[0m
+          [0m / [0m
+        [36m</div>[31m
+      [36m</div>[31m
+    [36m</div>[31m
+  [36m</body>[31m
+[36m</html>[31m[39m
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 10 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m lib/mock-data/activities.test.ts[2m > [22mscheduleActivities fixture[2m > [22mhas exactly 20 activities
+[31m[1mAssertionError[22m: expected [ { id: 'PIP-321', …(8) }, …(14) ] to have a length of 20 but got 15[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 20[39m
+[31m+ 15[39m
+
+[36m [2m❯[22m lib/mock-data/activities.test.ts:[2m6:32[22m[39m
+    [90m  4|[39m [34mdescribe[39m([32m'scheduleActivities fixture'[39m[33m,[39m () [33m=>[39m {
+    [90m  5|[39m   [34mit[39m([32m'has exactly 20 activities'[39m[33m,[39m () [33m=>[39m {
+    [90m  6|[39m     [34mexpect[39m(scheduleActivities)[33m.[39m[34mtoHaveLength[39m([34m20[39m)[33m;[39m
+    [90m   |[39m                                [31m^[39m
+    [90m  7|[39m   })[33m;[39m
+    [90m  8|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/10]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/mock-data/activities.test.ts[2m > [22mscheduleActivities fixture[2m > [22mhas unique IDs
+[31m[1mAssertionError[22m: expected 15 to be 20 // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 20[39m
+[31m+ 15[39m
+
+[36m [2m❯[22m lib/mock-data/activities.test.ts:[2m11:31[22m[39m
+    [90m  9|[39m   [34mit[39m([32m'has unique IDs'[39m[33m,[39m () [33m=>[39m {
+    [90m 10|[39m     [35mconst[39m ids [33m=[39m scheduleActivities[33m.[39m[34mmap[39m((a) [33m=>[39m a[33m.[39mid)[33m;[39m
+    [90m 11|[39m     [34mexpect[39m([35mnew[39m [33mSet[39m(ids)[33m.[39msize)[33m.[39m[34mtoBe[39m([34m20[39m)[33m;[39m
+    [90m   |[39m                               [31m^[39m
+    [90m 12|[39m   })[33m;[39m
+    [90m 13|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/10]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/mock-data/activities.test.ts[2m > [22mscheduleActivities fixture[2m > [22mhas at least one critical-path chain of 4+ activities
+[31m[1mAssertionError[22m: expected 0 to be greater than or equal to 4[39m
+[36m [2m❯[22m lib/mock-data/activities.test.ts:[2m25:29[22m[39m
+    [90m 23|[39m   [34mit[39m([32m'has at least one critical-path chain of 4+ activities'[39m[33m,[39m () [33m=>[39m {
+    [90m 24|[39m     const critical = scheduleActivities.filter((a) => a.isCriticalPath…
+    [90m 25|[39m     [34mexpect[39m(critical[33m.[39mlength)[33m.[39m[34mtoBeGreaterThanOrEqual[39m([34m4[39m)[33m;[39m
+    [90m   |[39m                             [31m^[39m
+    [90m 26|[39m   })[33m;[39m
+    [90m 27|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/10]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/mock-data/activities.test.ts[2m > [22mscheduleActivities fixture[2m > [22mevery activity has a WBS code and positive duration
+[31m[1mAssertionError[22m: expected 0 to be greater than 0[39m
+[36m [2m❯[22m lib/mock-data/activities.test.ts:[2m38:37[22m[39m
+    [90m 36|[39m     [35mfor[39m ([35mconst[39m activity [35mof[39m scheduleActivities) {
+    [90m 37|[39m       [34mexpect[39m(activity[33m.[39mwbsCode[33m.[39mlength)[33m.[39m[34mtoBeGreaterThan[39m([34m0[39m)[33m;[39m
+    [90m 38|[39m       [34mexpect[39m(activity[33m.[39mdurationDays)[33m.[39m[34mtoBeGreaterThan[39m([34m0[39m)[33m;[39m
+    [90m   |[39m                                     [31m^[39m
+    [90m 39|[39m     }
+    [90m 40|[39m   })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/10]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/mock-data/impact-and-recovery.test.ts[2m > [22mscheduleImpact fixture[2m > [22mreports a positive delay consistent with criticalPathMoved
+[31m[1mAssertionError[22m: expected 0 to be greater than 0[39m
+[36m [2m❯[22m lib/mock-data/impact-and-recovery.test.ts:[2m15:38[22m[39m
+    [90m 13|[39m
+    [90m 14|[39m   it('reports a positive delay consistent with criticalPathMoved', () …
+    [90m 15|[39m     [34mexpect[39m(scheduleImpact[33m.[39mdelayDays)[33m.[39m[34mtoBeGreaterThan[39m([34m0[39m)[33m;[39m
+    [90m   |[39m                                      [31m^[39m
+    [90m 16|[39m     [34mexpect[39m(scheduleImpact[33m.[39mcriticalPathMoved)[33m.[39m[34mtoBe[39m([35mtrue[39m)[33m;[39m
+    [90m 17|[39m   })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/10]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/mock-data/pipeline-fixtures.test.ts[2m > [22mpipeline fixtures referential integrity[2m > [22mincludes an update with no matched identifiers (semantic+context only)
+[31m[1mAssertionError[22m: expected false to be true // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- true[39m
+[31m+ false[39m
+
+[36m [2m❯[22m lib/mock-data/pipeline-fixtures.test.ts:[2m51:26[22m[39m
+    [90m 49|[39m       (m) => m.reasons.identifiersMatched.length === 0 && m.route !== …
+    [90m 50|[39m     )[33m;[39m
+    [90m 51|[39m     [34mexpect[39m(semanticOnly)[33m.[39m[34mtoBe[39m([35mtrue[39m)[33m;[39m
+    [90m   |[39m                          [31m^[39m
+    [90m 52|[39m   })[33m;[39m
+    [90m 53|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/10]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/mock-data/pipeline-fixtures.test.ts[2m > [22mpipeline fixtures referential integrity[2m > [22mincludes a genuinely unmatched activity
+[31m[1mAssertionError[22m: expected 0 to be greater than or equal to 1[39m
+[36m [2m❯[22m lib/mock-data/pipeline-fixtures.test.ts:[2m56:30[22m[39m
+    [90m 54|[39m   [34mit[39m([32m'includes a genuinely unmatched activity'[39m[33m,[39m () [33m=>[39m {
+    [90m 55|[39m     const unmatched = matchResults.filter((m) => m.route === 'unmatche…
+    [90m 56|[39m     [34mexpect[39m(unmatched[33m.[39mlength)[33m.[39m[34mtoBeGreaterThanOrEqual[39m([34m1[39m)[33m;[39m
+    [90m   |[39m                              [31m^[39m
+    [90m 57|[39m   })[33m;[39m
+    [90m 58|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/10]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/mock-data/pipeline-fixtures.test.ts[2m > [22mpipeline fixtures referential integrity[2m > [22mincludes two updates describing the same work differently, both matching the same activity
+[31m[1mAssertionError[22m: expected false to be true // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- true[39m
+[31m+ false[39m
+
+[36m [2m❯[22m lib/mock-data/pipeline-fixtures.test.ts:[2m77:31[22m[39m
+    [90m 75|[39m     }
+    [90m 76|[39m     const hasDuplicateMatch = [...byActivity.values()].some((count) =>…
+    [90m 77|[39m     [34mexpect[39m(hasDuplicateMatch)[33m.[39m[34mtoBe[39m([35mtrue[39m)[33m;[39m
+    [90m   |[39m                               [31m^[39m
+    [90m 78|[39m   })[33m;[39m
+    [90m 79|[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/10]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/store/review-store.test.tsx[2m > [22mreview-store[2m > [22maccept sets route to auto_post
+[31m[1mTestingLibraryElementError[22m: Unable to find an element by: [data-testid="match-m-8"]
+
+Ignored nodes: comments, script, style
+[36m<body>[31m
+  [36m<div>[31m
+    [36m<div>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"count"[31m
+      [36m>[31m
+        [0m9[0m
+      [36m</div>[31m
+      [36m<button>[31m
+        [0maccept[0m
+      [36m</button>[31m
+      [36m<button>[31m
+        [0mreject[0m
+      [36m</button>[31m
+      [36m<button>[31m
+        [0mreassign[0m
+      [36m</button>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"match-m-PIP-322"[31m
+      [36m>[31m
+        [0mauto_post[0m
+        [0m / [0m
+        [0mPIP-322[0m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"match-m-CIV-112"[31m
+      [36m>[31m
+        [0mauto_post[0m
+        [0m / [0m
+        [0mCIV-112[0m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"match-m-ELE-341"[31m
+      [36m>[31m
+        [0mauto_post[0m
+        [0m / [0m
+        [0mELE-341[0m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"match-m-13"[31m
+      [36m>[31m
+        [0mreview[0m
+        [0m / [0m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"match-m-14"[31m
+      [36m>[31m
+        [0mreview[0m
+        [0m / [0m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"match-m-15"[31m
+      [36m>[31m
+        [0mreview[0m
+        [0m / [0m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"match-m-16"[31m
+      [36m>[31m
+        [0mreview[0m
+        [0m / [0m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"match-m-17"[31m
+      [36m>[31m
+        [0mreview[0m
+        [0m / [0m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"match-m-18"[31m
+      [36m>[31m
+        [0mreview[0m
+        [0m / [0m
+      [36m</div>[31m
+    [36m</div>[31m
+  [36m</div>[31m
+[36m</body>[31m
+
+Ignored nodes: comments, script, style
+[36m<html>[31m
+  [36m<head />[31m
+  [36m<body>[31m
+    [36m<div>[31m
+      [36m<div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"count"[31m
+        [36m>[31m
+          [0m9[0m
+        [36m</div>[31m
+        [36m<button>[31m
+          [0maccept[0m
+        [36m</button>[31m
+        [36m<button>[31m
+          [0mreject[0m
+        [36m</button>[31m
+        [36m<button>[31m
+          [0mreassign[0m
+        [36m</button>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"match-m-PIP-322"[31m
+        [36m>[31m
+          [0mauto_post[0m
+          [0m / [0m
+          [0mPIP-322[0m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"match-m-CIV-112"[31m
+        [36m>[31m
+          [0mauto_post[0m
+          [0m / [0m
+          [0mCIV-112[0m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"match-m-ELE-341"[31m
+        [36m>[31m
+          [0mauto_post[0m
+          [0m / [0m
+          [0mELE-341[0m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"match-m-13"[31m
+        [36m>[31m
+          [0mreview[0m
+          [0m / [0m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"match-m-14"[31m
+        [36m>[31m
+          [0mreview[0m
+          [0m / [0m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"match-m-15"[31m
+        [36m>[31m
+          [0mreview[0m
+          [0m / [0m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"match-m-16"[31m
+        [36m>[31m
+          [0mreview[0m
+          [0m / [0m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"match-m-17"[31m
+        [36m>[31m
+          [0mreview[0m
+          [0m / [0m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"match-m-18"[31m
+        [36m>[31m
+          [0mreview[0m
+          [0m / [0m
+        [36m</div>[31m
+      [36m</div>[31m
+    [36m</div>[31m
+  [36m</body>[31m
+[36m</html>[31m[39m
+[90m [2m❯[22m waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:[2m163:27[22m[39m
+[36m [2m❯[22m lib/store/review-store.test.tsx:[2m32:11[22m[39m
+    [90m 30|[39m     await waitFor(() => expect(screen.getByTestId('count')).toBeInTheD…
+    [90m 31|[39m     screen[33m.[39m[34mgetByText[39m([32m'accept'[39m)[33m.[39m[34mclick[39m()[33m;[39m
+    [90m 32|[39m     [35mawait[39m [34mwaitFor[39m(() [33m=>[39m
+    [90m   |[39m           [31m^[39m
+    [90m 33|[39m       expect(screen.getByTestId('match-m-8').textContent).toContain('a…
+    [90m 34|[39m     )[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/10]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m lib/store/review-store.test.tsx[2m > [22mreview-store[2m > [22mreassign updates matchedActivityId
+[31m[1mTestingLibraryElementError[22m: Unable to find an element by: [data-testid="match-m-8"]
+
+Ignored nodes: comments, script, style
+[36m<body>[31m
+  [36m<div>[31m
+    [36m<div>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"count"[31m
+      [36m>[31m
+        [0m9[0m
+      [36m</div>[31m
+      [36m<button>[31m
+        [0maccept[0m
+      [36m</button>[31m
+      [36m<button>[31m
+        [0mreject[0m
+      [36m</button>[31m
+      [36m<button>[31m
+        [0mreassign[0m
+      [36m</button>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"match-m-PIP-322"[31m
+      [36m>[31m
+        [0mauto_post[0m
+        [0m / [0m
+        [0mPIP-322[0m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"match-m-CIV-112"[31m
+      [36m>[31m
+        [0mauto_post[0m
+        [0m / [0m
+        [0mCIV-112[0m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"match-m-ELE-341"[31m
+      [36m>[31m
+        [0mauto_post[0m
+        [0m / [0m
+        [0mELE-341[0m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"match-m-13"[31m
+      [36m>[31m
+        [0mreview[0m
+        [0m / [0m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"match-m-14"[31m
+      [36m>[31m
+        [0mreview[0m
+        [0m / [0m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"match-m-15"[31m
+      [36m>[31m
+        [0mreview[0m
+        [0m / [0m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"match-m-16"[31m
+      [36m>[31m
+        [0mreview[0m
+        [0m / [0m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"match-m-17"[31m
+      [36m>[31m
+        [0mreview[0m
+        [0m / [0m
+      [36m</div>[31m
+      [36m<div[31m
+        [33mdata-testid[31m=[32m"match-m-18"[31m
+      [36m>[31m
+        [0mreview[0m
+        [0m / [0m
+      [36m</div>[31m
+    [36m</div>[31m
+  [36m</div>[31m
+[36m</body>[31m
+
+Ignored nodes: comments, script, style
+[36m<html>[31m
+  [36m<head />[31m
+  [36m<body>[31m
+    [36m<div>[31m
+      [36m<div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"count"[31m
+        [36m>[31m
+          [0m9[0m
+        [36m</div>[31m
+        [36m<button>[31m
+          [0maccept[0m
+        [36m</button>[31m
+        [36m<button>[31m
+          [0mreject[0m
+        [36m</button>[31m
+        [36m<button>[31m
+          [0mreassign[0m
+        [36m</button>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"match-m-PIP-322"[31m
+        [36m>[31m
+          [0mauto_post[0m
+          [0m / [0m
+          [0mPIP-322[0m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"match-m-CIV-112"[31m
+        [36m>[31m
+          [0mauto_post[0m
+          [0m / [0m
+          [0mCIV-112[0m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"match-m-ELE-341"[31m
+        [36m>[31m
+          [0mauto_post[0m
+          [0m / [0m
+          [0mELE-341[0m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"match-m-13"[31m
+        [36m>[31m
+          [0mreview[0m
+          [0m / [0m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"match-m-14"[31m
+        [36m>[31m
+          [0mreview[0m
+          [0m / [0m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"match-m-15"[31m
+        [36m>[31m
+          [0mreview[0m
+          [0m / [0m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"match-m-16"[31m
+        [36m>[31m
+          [0mreview[0m
+          [0m / [0m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"match-m-17"[31m
+        [36m>[31m
+          [0mreview[0m
+          [0m / [0m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mdata-testid[31m=[32m"match-m-18"[31m
+        [36m>[31m
+          [0mreview[0m
+          [0m / [0m
+        [36m</div>[31m
+      [36m</div>[31m
+    [36m</div>[31m
+  [36m</body>[31m
+[36m</html>[31m[39m
+[90m [2m❯[22m waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:[2m163:27[22m[39m
+[36m [2m❯[22m lib/store/review-store.test.tsx:[2m45:11[22m[39m
+    [90m 43|[39m     await waitFor(() => expect(screen.getByTestId('count')).toBeInTheD…
+    [90m 44|[39m     screen[33m.[39m[34mgetByText[39m([32m'reassign'[39m)[33m.[39m[34mclick[39m()[33m;[39m
+    [90m 45|[39m     [35mawait[39m [34mwaitFor[39m(() [33m=>[39m
+    [90m   |[39m           [31m^[39m
+    [90m 46|[39m       expect(screen.getByTestId('match-m-8').textContent).toContain('a…
+    [90m 47|[39m     )[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/10]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m4 failed[39m[22m[2m | [22m[1m[32m9 passed[39m[22m[90m (13)[39m
+[2m      Tests [22m [1m[31m10 failed[39m[22m[2m | [22m[1m[32m58 passed[39m[22m[90m (68)[39m
+[2m   Start at [22m 17:24:41
+[2m   Duration [22m 3.28s[2m (transform 410ms, setup 1.84s, import 676ms, tests 2.34s, environment 8.71s)[22m
+
