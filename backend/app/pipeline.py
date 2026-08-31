@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import time
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 
 from sqlalchemy import select
@@ -92,6 +93,9 @@ def normalize(db: Session, row: SourceRow) -> tuple[NormalizedFieldInput, dict]:
     text, applied = rules.normalize_text(text)
     if applied:
         trace["normalizer"] = {"rules_applied": applied, "source": "Terminology_Variants"}
+        if row.normalized_text != text:      # evidence view must show what the model read
+            row.normalized_text = text
+            db.commit()
 
     return NormalizedFieldInput(
         source_id=row.id, project_id=row.project_id, text=text,
@@ -128,31 +132,38 @@ def _persist(db: Session, ev: ExecutionEvent, actor: str) -> None:
           validator=VALIDATOR_VERSION, confidence=ev.extraction_confidence)
 
 
+def _build_event(db: Session, extracted, project_id: str, source_id: str, trace: dict,
+                 prior: list, span_count: int) -> ExecutionEvent:
+    warns = rules.validate_event(extracted)
+    conflicts = rules.detect_conflicts(extracted, prior)
+    trust, reasons = rules.decide_trust(extracted, warns, conflicts, span_count)
+    return ExecutionEvent(
+        **extracted.model_dump(exclude={"warnings"}),
+        warnings=sorted(set(extracted.warnings) | set(warns)),
+        event_id=_next_id(db, EventRow, EventRow.event_id, "EVT"),
+        project_id=project_id, source_id=source_id,
+        trust=trust, trust_reasons=reasons, conflicts=conflicts,
+        model_used=settings.reasoning_model, prompt_version=PROMPT_VERSION,
+        agent_trace=trace, extracted_at=datetime.now(timezone.utc),
+    )
+
+
 def extract(db: Session, norm: NormalizedFieldInput, *, actor: str = "system",
             base_trace: dict | None = None) -> ExtractionResult:
     """segment -> extract -> validate -> conflicts -> trust -> persist."""
     t0 = time.perf_counter()
-    events, failures, trace = agents.extract_events(norm.text)
-    trace = {**(base_trace or {}), **trace, "validator": VALIDATOR_VERSION}
+    ref = (norm.event_timestamp or datetime.now(timezone.utc)).date()
+    events, failures, trace = agents.extract_events(norm.text, ref)
+    trace = {**(base_trace or {}), **trace, "validator": VALIDATOR_VERSION,
+             "reference_date": ref.isoformat()}
 
     prior = _prior_events(db, norm.project_id)
     out: list[ExecutionEvent] = []
     warnings: list[str] = []
 
     for extracted in events:
-        warns = rules.validate_event(extracted)
-        conflicts = rules.detect_conflicts(extracted, prior)
-        trust, reasons = rules.decide_trust(extracted, warns, conflicts, len(events))
-
-        ev = ExecutionEvent(
-            **extracted.model_dump(exclude={"warnings"}),
-            warnings=sorted(set(extracted.warnings) | set(warns)),
-            event_id=_next_id(db, EventRow, EventRow.event_id, "EVT"),
-            project_id=norm.project_id, source_id=norm.source_id,
-            trust=trust, trust_reasons=reasons, conflicts=conflicts,
-            model_used=settings.reasoning_model, prompt_version=PROMPT_VERSION,
-            agent_trace=trace, extracted_at=datetime.now(timezone.utc),
-        )
+        ev = _build_event(db, extracted, norm.project_id, norm.source_id, trace,
+                          prior, len(events))
         _persist(db, ev, actor)
         db.commit()                 # commit per event so _next_id sees it
         prior.insert(0, ev)         # later spans conflict-check against earlier ones
@@ -190,20 +201,36 @@ def extract_batch(db: Session, source_id: str, *, actor: str = "system") -> Extr
 
     t0 = time.perf_counter()
     events, failures, warnings = [], [], list((row.meta or {}).get("parse_warnings", []))
-    for r in rows:
-        sentence, _ = rules.normalize_text(r["sentence"])
-        norm = NormalizedFieldInput(
-            source_id=row.id, project_id=row.project_id, text=sentence,
-            source_type=SourceType(row.source_type), event_timestamp=row.event_timestamp,
-            meta={"row_index": r.get("row_index")},
-        )
-        try:
-            res = extract(db, norm, actor=actor,
-                          base_trace={"row_index": r.get("row_index")})
-            events.extend(res.events)
-            failures.extend(res.failed_records)
-        except agents.ExtractionError as e:
-            failures.append({"row_index": r.get("row_index"), "span": sentence, "reason": str(e)})
+    ref = (row.event_timestamp or datetime.now(timezone.utc)).date()
+
+    # Rows are independent for the LLM part, so fan them out; then persist in row order so
+    # conflict detection still sees earlier rows as prior events.
+    sentences = [(r.get("row_index"), rules.normalize_text(r["sentence"])[0]) for r in rows]
+    with ThreadPoolExecutor(max_workers=min(len(sentences), 6)) as pool:
+        futures = [(idx, text, pool.submit(agents.extract_events, text, ref))
+                   for idx, text in sentences]
+        results = []
+        for idx, text, fut in futures:
+            try:
+                results.append((idx, text, fut.result(), None))
+            except agents.ExtractionError as e:
+                results.append((idx, text, None, str(e)))
+
+    prior = _prior_events(db, row.project_id)
+    for idx, text, res, err in results:
+        if err or res is None:
+            failures.append({"row_index": idx, "span": text, "reason": err or "no result"})
+            continue
+        extracted, row_failures, trace = res
+        failures.extend({**f, "row_index": idx} for f in row_failures)
+        trace = {**trace, "row_index": idx, "validator": VALIDATOR_VERSION,
+                 "reference_date": ref.isoformat()}
+        for e in extracted:
+            ev = _build_event(db, e, row.project_id, row.id, trace, prior, len(extracted))
+            _persist(db, ev, actor)
+            db.commit()
+            prior.insert(0, ev)
+            events.append(ev)
 
     return ExtractionResult(source_id=source_id, events=events, warnings=warnings,
                             failed_records=failures,

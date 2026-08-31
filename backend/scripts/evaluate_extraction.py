@@ -29,9 +29,19 @@ def _norm(s):
     return (str(s).strip().lower().replace("-", " ").replace("_", " ") if s else None)
 
 
+def _expected_fields() -> dict[str, dict]:
+    """Benchmark_Events has no expected_discipline/location columns, but it does have
+    expected_activity_id -- so the answer key for those fields is the schedule activity
+    itself. Derived, not invented."""
+    acts, _ = ontology.load_activities(settings.ontology_path, "BENCH")
+    return {a.activity_id: {"discipline": a.discipline.value, "location": a.location}
+            for a in acts}
+
+
 def run_extraction(split: str, limit: int | None) -> dict:
     cases = [c for c in ontology.load_benchmark(settings.ontology_path)
              if split == "All" or c["test_split"] == split]
+    expected = _expected_fields()
     if limit:
         cases = cases[:limit]
 
@@ -68,6 +78,13 @@ def run_extraction(split: str, limit: int | None) -> dict:
                for w in warns):
             hallucinations += 1
 
+        want = expected.get(c["expected_activity_id"] or "", {})
+        rec["expected_discipline"] = want.get("discipline")
+        rec["expected_location"] = want.get("location")
+        rec["discipline_ok"] = (want.get("discipline") is None
+                                or ev.discipline.value == want["discipline"])
+        rec["location_ok"] = (want.get("location") is None or ev.location is None
+                              or _norm(ev.location) == _norm(want["location"]))
         rec.update(
             actual_decision=trust.value, trust_reasons=reasons,
             spans=len(events), discipline=ev.discipline.value, location=ev.location,
@@ -99,6 +116,13 @@ def report_extraction(res: dict) -> None:
           f"({dec_ok/len(ran)*100:.0f}%)" if ran else "TRUST DECISION MATCH : n/a")
     print(f"HALLUCINATION FLAGS  : {res['hallucinations']}"
           "   (identifier or progress unsupported by evidence)")
+    scored = [r for r in ran if r.get("expected_discipline")]
+    if scored:
+        d_ok = sum(1 for r in scored if r["discipline_ok"])
+        l_ok = sum(1 for r in scored if r["location_ok"])
+        print(f"DISCIPLINE ACCURACY  : {d_ok}/{len(scored)} ({d_ok/len(scored)*100:.0f}%)"
+              "   vs the schedule activity's own discipline")
+        print(f"LOCATION ACCURACY    : {l_ok}/{len(scored)} ({l_ok/len(scored)*100:.0f}%)")
     if with_ms:
         print(f"PROCESSING TIME      : median {sorted(with_ms)[len(with_ms)//2]} ms/report, "
               f"total {res['wall_ms']/1000:.1f}s")
@@ -108,6 +132,17 @@ def report_extraction(res: dict) -> None:
     for (exp, act), n in sorted(conf.items()):
         mark = " " if exp == act else "!"
         print(f"  {mark} {exp:10s} -> {act:10s}  x{n}")
+
+    bad_fields = [r for r in ran if r.get("expected_discipline")
+                  and not (r["discipline_ok"] and r["location_ok"])]
+    if bad_fields:
+        print("\nField mismatches vs the schedule activity:")
+        for r in bad_fields:
+            print(f"  {r['case_id']}: {r['report']}")
+            if not r["discipline_ok"]:
+                print(f"     discipline: got {r['discipline']} want {r['expected_discipline']}")
+            if not r["location_ok"]:
+                print(f"     location  : got {r['location']} want {r['expected_location']}")
 
     wrong = [r for r in ran if r["actual_decision"] != r["expected_decision"]]
     if wrong:
@@ -138,8 +173,9 @@ def run_conflicts() -> dict:
         try:
             e_txt, _ = rules.normalize_text(c["earlier_report"])
             l_txt, _ = rules.normalize_text(c["later_report"])
-            earlier = agents.extract_event(e_txt)
-            later = agents.extract_event(l_txt)
+            ref = datetime.now().date()
+            earlier = agents.extract_event(e_txt, ref)
+            later = agents.extract_event(l_txt, ref)
         except agents.ExtractionError as e:
             rec.update(error=str(e))
             rows.append(rec)
@@ -148,6 +184,12 @@ def run_conflicts() -> dict:
                               project_id="BENCH", source_id="BENCH",
                               model_used=settings.reasoning_model,
                               extracted_at=datetime.now())
+        # record what was extracted -- a MISS is undebuggable without it
+        for tag, x in (("earlier", earlier), ("later", later)):
+            rec[tag] = {"desc": x.activity_description, "status": x.status.value,
+                        "pct": x.progress_percent, "date": str(x.event_date),
+                        "asset": x.identifiers.asset_tag, "loc": x.location}
+        rec["same_work"] = rules.same_work(later, earlier)
         found = rules.detect_conflicts(later, [prior])
         rec["found"] = [{"type": f.conflict_type.value, "action": f.action.value} for f in found]
         rec["type_ok"] = any(f["type"] == rec["expected_type"] for f in rec["found"])
@@ -173,6 +215,9 @@ def report_conflicts(res: dict) -> None:
             mark = "OK  " if r["type_ok"] else "MISS"
             print(f"  {mark} {r['case_id']} expected {r['expected_type']}/"
                   f"{r['expected_action']} -> {r['found']}")
+            if not r["type_ok"]:
+                print(f"        earlier: {r['earlier']}")
+                print(f"        later  : {r['later']}   same_work={r['same_work']}")
 
 
 def main() -> None:

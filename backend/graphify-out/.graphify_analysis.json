@@ -1,0 +1,483 @@
+{
+  "communities": {
+    "0": [
+      "app_db",
+      "app_db_activityrow",
+      "app_db_auditrow",
+      "app_db_base",
+      "app_db_eventrow",
+      "app_db_get_session",
+      "app_db_memoryrow",
+      "app_db_py_datetime",
+      "app_db_rationale_1",
+      "app_db_rationale_119",
+      "app_db_rationale_131",
+      "app_db_sourcerow",
+      "app_db_user",
+      "app_db_utcnow",
+      "app_db_variantrow",
+      "app_routes",
+      "app_routes_extract",
+      "app_routes_extract_batch",
+      "app_routes_extract_raw",
+      "app_routes_get_event",
+      "app_routes_get_evidence",
+      "app_routes_get_source",
+      "app_routes_health",
+      "app_routes_import_schedule",
+      "app_routes_ingest_file",
+      "app_routes_ingest_image",
+      "app_routes_ingest_text",
+      "app_routes_list_activities",
+      "app_routes_list_audit",
+      "app_routes_list_events",
+      "app_routes_list_sources",
+      "app_routes_login",
+      "app_routes_me",
+      "app_routes_model_err",
+      "app_routes_py_session",
+      "app_routes_rationale_1",
+      "app_routes_store_binary",
+      "app_schemas_evidenceresponse",
+      "app_schemas_extractrequest",
+      "app_schemas_healthresponse",
+      "app_schemas_ingesttextrequest",
+      "app_schemas_loginrequest",
+      "app_schemas_quantity",
+      "app_schemas_rationale_280",
+      "app_schemas_rawextractrequest",
+      "app_schemas_tokenresponse",
+      "basemodel",
+      "date",
+      "declarativebase",
+      "uploadfile"
+    ],
+    "1": [
+      "app_schemas_identifiers",
+      "app_schemas_identifiers_present",
+      "tests_test_pipeline",
+      "tests_test_pipeline_ev",
+      "tests_test_pipeline_onto",
+      "tests_test_pipeline_rationale_1",
+      "tests_test_pipeline_rationale_149",
+      "tests_test_pipeline_rationale_175",
+      "tests_test_pipeline_rationale_188",
+      "tests_test_pipeline_rationale_333",
+      "tests_test_pipeline_rationale_339",
+      "tests_test_pipeline_rationale_360",
+      "tests_test_pipeline_stored",
+      "tests_test_pipeline_test_activities_load_with_authoritative_ids",
+      "tests_test_pipeline_test_benchmark_shifted_rows_are_repaired",
+      "tests_test_pipeline_test_canonicalised_location_is_not_a_hallucination",
+      "tests_test_pipeline_test_clean_event_auto_posts",
+      "tests_test_pipeline_test_conflict_cases",
+      "tests_test_pipeline_test_corrupt_table_raises_valueerror",
+      "tests_test_pipeline_test_digit_in_location_is_not_progress_evidence",
+      "tests_test_pipeline_test_discipline_specific_completion_verbs",
+      "tests_test_pipeline_test_excel_rows_become_sentences",
+      "tests_test_pipeline_test_explicit_percent_passes",
+      "tests_test_pipeline_test_extractor_gives_up_cleanly",
+      "tests_test_pipeline_test_extractor_repairs_bad_json_once",
+      "tests_test_pipeline_test_flagged_conflict_forces_review",
+      "tests_test_pipeline_test_hyphenated_location_is_normalised",
+      "tests_test_pipeline_test_identifier_not_in_evidence_is_flagged",
+      "tests_test_pipeline_test_invented_location_is_still_flagged",
+      "tests_test_pipeline_test_low_confidence_goes_unmatched",
+      "tests_test_pipeline_test_missing_asset_goes_to_review",
+      "tests_test_pipeline_test_multiple_activities_go_to_review",
+      "tests_test_pipeline_test_normalization_rules_come_from_variants_without_activity",
+      "tests_test_pipeline_test_normalizer",
+      "tests_test_pipeline_test_one_bad_span_does_not_kill_the_batch",
+      "tests_test_pipeline_test_salvage_json",
+      "tests_test_pipeline_test_salvage_json_rejects_garbage",
+      "tests_test_pipeline_test_single_short_sentence_skips_the_model",
+      "tests_test_pipeline_test_unknown_columns_are_preserved_not_dropped",
+      "tests_test_pipeline_test_unrelated_work_does_not_pair",
+      "tests_test_pipeline_test_valid_progression_is_not_flagged",
+      "tests_test_pipeline_test_wbs_path_is_chained",
+      "tests_test_pipeline_trust"
+    ],
+    "2": [
+      "app_auth",
+      "app_auth_current_user",
+      "app_auth_hash_password",
+      "app_auth_make_token",
+      "app_auth_py_session",
+      "app_auth_rationale_1",
+      "app_auth_rationale_64",
+      "app_auth_require_role",
+      "app_auth_verify_password",
+      "app_config",
+      "app_config_py_path",
+      "app_config_rationale_1",
+      "app_config_rationale_45",
+      "app_config_settings",
+      "app_config_settings_cors_list",
+      "app_config_settings_ontology_path",
+      "app_db_init_db",
+      "app_main",
+      "app_main_lifespan",
+      "app_main_rationale_1",
+      "app_main_rationale_69",
+      "app_main_root",
+      "app_main_unhandled",
+      "basesettings",
+      "exception",
+      "fastapi",
+      "httpauthorizationcredentials",
+      "request",
+      "scripts_seed_users",
+      "scripts_seed_users_main",
+      "scripts_seed_users_rationale_1"
+    ],
+    "3": [
+      "app_rules",
+      "app_rules_decide_trust",
+      "app_rules_detect_conflicts",
+      "app_rules_known_locations",
+      "app_rules_rationale_1",
+      "app_rules_rationale_127",
+      "app_rules_rationale_140",
+      "app_rules_rationale_209",
+      "app_rules_rationale_38",
+      "app_rules_rationale_79",
+      "app_rules_same_work",
+      "app_rules_tokens",
+      "app_rules_validate_event",
+      "app_schemas",
+      "app_schemas_conflictaction",
+      "app_schemas_conflictfinding",
+      "app_schemas_conflicttype",
+      "app_schemas_discipline",
+      "app_schemas_extractedevent",
+      "app_schemas_extractedevent_coerce_enum",
+      "app_schemas_extractedevent_coerce_pct",
+      "app_schemas_rationale_1",
+      "app_schemas_rationale_136",
+      "app_schemas_rationale_50",
+      "app_schemas_rationale_57",
+      "app_schemas_role",
+      "app_schemas_status",
+      "app_schemas_trustdecision",
+      "enum",
+      "str"
+    ],
+    "4": [
+      "app_ontology",
+      "app_ontology_discipline",
+      "app_ontology_load_activities",
+      "app_ontology_load_benchmark",
+      "app_ontology_load_conflict_cases",
+      "app_ontology_load_variants",
+      "app_ontology_normalization_rules",
+      "app_ontology_py_any",
+      "app_ontology_py_dataframe",
+      "app_ontology_py_path",
+      "app_ontology_rationale_1",
+      "app_ontology_rationale_198",
+      "app_ontology_rationale_210",
+      "app_ontology_rationale_53",
+      "app_ontology_rationale_74",
+      "app_ontology_rationale_96",
+      "app_ontology_read",
+      "app_ontology_s",
+      "app_ontology_split_refs",
+      "app_rules_normalize_text",
+      "app_rules_rationale_48",
+      "app_rules_rules",
+      "app_schemas_rationale_209",
+      "app_schemas_rationale_241",
+      "app_schemas_scheduleactivity",
+      "app_schemas_scheduleactivity_disc",
+      "app_schemas_terminologyvariant"
+    ],
+    "5": [
+      "app_pipeline",
+      "app_pipeline_audit",
+      "app_pipeline_capture",
+      "app_pipeline_extract",
+      "app_pipeline_extract_batch",
+      "app_pipeline_extract_source",
+      "app_pipeline_import_schedule",
+      "app_pipeline_next_id",
+      "app_pipeline_normalize",
+      "app_pipeline_persist",
+      "app_pipeline_prior_events",
+      "app_pipeline_py_datetime",
+      "app_pipeline_py_session",
+      "app_pipeline_rationale_1",
+      "app_pipeline_rationale_133",
+      "app_pipeline_rationale_183",
+      "app_pipeline_rationale_215",
+      "app_pipeline_rationale_36",
+      "app_pipeline_rationale_69",
+      "app_schemas_capturedsource",
+      "app_schemas_extractionresult",
+      "app_schemas_normalizedfieldinput",
+      "app_schemas_rationale_101",
+      "app_schemas_rationale_199",
+      "app_schemas_scheduleimportresponse",
+      "app_schemas_sourcetype"
+    ],
+    "6": [
+      "readme_audit_ledger",
+      "readme_captured_source",
+      "readme_critical_path_method",
+      "readme_execution_event",
+      "readme_extracted_event",
+      "readme_extraction_trust",
+      "readme_extractor_agent",
+      "readme_matcher",
+      "readme_normalized_field_input",
+      "readme_normalizer_agent",
+      "readme_plan2reality_capture_understand_layer",
+      "readme_planner_console",
+      "readme_rbac",
+      "readme_segmenter_agent",
+      "readme_terminology_variants",
+      "readme_transcription_agent",
+      "requirements_bcrypt",
+      "requirements_fastapi",
+      "requirements_httpx",
+      "requirements_openai",
+      "requirements_pydantic",
+      "requirements_pyjwt",
+      "requirements_pytest",
+      "requirements_python_multipart",
+      "requirements_uvicorn"
+    ],
+    "7": [
+      "app_agents",
+      "app_agents_chat",
+      "app_agents_client",
+      "app_agents_extract_event",
+      "app_agents_extract_events",
+      "app_agents_extractionerror",
+      "app_agents_rationale_1",
+      "app_agents_rationale_107",
+      "app_agents_rationale_123",
+      "app_agents_rationale_145",
+      "app_agents_rationale_33",
+      "app_agents_rationale_49",
+      "app_agents_rationale_69",
+      "app_agents_rationale_87",
+      "app_agents_salvage_json",
+      "app_agents_segment",
+      "app_agents_transcribe",
+      "app_prompts",
+      "app_prompts_extraction_messages",
+      "app_prompts_rationale_1",
+      "app_prompts_segmenter_messages",
+      "openai",
+      "runtimeerror"
+    ],
+    "8": [
+      "app_schemas_executionevent",
+      "app_schemas_rationale_179",
+      "scripts_evaluate_extraction",
+      "scripts_evaluate_extraction_main",
+      "scripts_evaluate_extraction_norm",
+      "scripts_evaluate_extraction_rationale_1",
+      "scripts_evaluate_extraction_rationale_131",
+      "scripts_evaluate_extraction_report_conflicts",
+      "scripts_evaluate_extraction_report_extraction",
+      "scripts_evaluate_extraction_run_conflicts",
+      "scripts_evaluate_extraction_run_extraction"
+    ],
+    "9": [
+      "app_parsers",
+      "app_parsers_cell",
+      "app_parsers_norm_cols",
+      "app_parsers_parse_table",
+      "app_parsers_py_any",
+      "app_parsers_py_dataframe",
+      "app_parsers_rationale_1",
+      "app_parsers_rationale_51",
+      "app_parsers_rationale_81",
+      "app_parsers_row_to_sentence"
+    ],
+    "10": [
+      "readme_activity_register",
+      "readme_benchmark_events",
+      "readme_schedule_activities",
+      "readme_schedule_activity",
+      "requirements_numpy",
+      "requirements_openpyxl",
+      "requirements_pandas"
+    ],
+    "11": [
+      "readme_evidence_backed_validation",
+      "readme_validator_agent"
+    ],
+    "12": [
+      "requirements_psycopg",
+      "requirements_sqlalchemy"
+    ],
+    "13": [
+      "requirements_pydantic_settings",
+      "requirements_python_dotenv"
+    ]
+  },
+  "cohesion": {
+    "0": 0.10204081632653061,
+    "1": 0.07862679955703211,
+    "2": 0.07956989247311828,
+    "3": 0.13333333333333333,
+    "4": 0.13675213675213677,
+    "5": 0.18153846153846154,
+    "6": 0.08666666666666667,
+    "7": 0.1541501976284585,
+    "8": 0.23636363636363636,
+    "9": 0.28888888888888886,
+    "10": 0.2857142857142857,
+    "11": 1.0,
+    "12": 1.0,
+    "13": 1.0
+  },
+  "gods": [
+    {
+      "id": "app_db_user",
+      "label": "User",
+      "degree": 23
+    },
+    {
+      "id": "app_schemas_extractedevent",
+      "label": "ExtractedEvent",
+      "degree": 17
+    },
+    {
+      "id": "app_schemas_identifiers",
+      "label": "Identifiers",
+      "degree": 15
+    },
+    {
+      "id": "tests_test_pipeline_ev",
+      "label": "ev()",
+      "degree": 14
+    },
+    {
+      "id": "app_ontology_load_activities",
+      "label": "load_activities()",
+      "degree": 13
+    },
+    {
+      "id": "app_pipeline_extract",
+      "label": "extract()",
+      "degree": 13
+    },
+    {
+      "id": "app_db_sourcerow",
+      "label": "SourceRow",
+      "degree": 12
+    },
+    {
+      "id": "app_schemas_executionevent",
+      "label": "ExecutionEvent",
+      "degree": 12
+    },
+    {
+      "id": "app_agents_extractionerror",
+      "label": "ExtractionError",
+      "degree": 10
+    },
+    {
+      "id": "app_db_eventrow",
+      "label": "EventRow",
+      "degree": 10
+    }
+  ],
+  "surprises": [
+    {
+      "source": "main()",
+      "target": "User",
+      "source_files": [
+        "scripts/seed_users.py",
+        "app/db.py"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "connects across different repos/directories; bridges separate communities"
+    },
+    {
+      "source": "ev()",
+      "target": "ExtractedEvent",
+      "source_files": [
+        "tests/test_pipeline.py",
+        "app/schemas.py"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "connects across different repos/directories; bridges separate communities"
+    },
+    {
+      "source": "stored()",
+      "target": "ExecutionEvent",
+      "source_files": [
+        "tests/test_pipeline.py",
+        "app/schemas.py"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "connects across different repos/directories; bridges separate communities"
+    },
+    {
+      "source": "Plan2Reality Capture & Understand Layer",
+      "target": "FastAPI 0.121.2",
+      "source_files": [
+        "README.md",
+        "requirements.txt"
+      ],
+      "confidence": "INFERRED",
+      "relation": "references",
+      "why": "inferred connection - not explicitly stated in source; connects across different repos/directories"
+    },
+    {
+      "source": "Plan2Reality Capture & Understand Layer",
+      "target": "pytest 9.0.1",
+      "source_files": [
+        "README.md",
+        "requirements.txt"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "connects across different repos/directories; peripheral node `pytest 9.0.1` unexpectedly reaches hub `Plan2Reality Capture & Understand Layer`"
+    }
+  ],
+  "questions": [
+    {
+      "type": "bridge_node",
+      "question": "Why does `ExtractedEvent` connect `Community 3` to `Community 8`, `Community 0`, `Community 1`, `Community 7`?",
+      "why": "High betweenness centrality (0.067) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `ExecutionEvent` connect `Community 8` to `Community 0`, `Community 1`, `Community 3`, `Community 5`?",
+      "why": "High betweenness centrality (0.046) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `load_activities()` connect `Community 4` to `Community 1`, `Community 3`, `Community 5`?",
+      "why": "High betweenness centrality (0.033) - this node is a cross-community bridge."
+    },
+    {
+      "type": "isolated_nodes",
+      "question": "What connects `Normalizer Agent`, `Segmenter Agent`, `Validator Agent` to the rest of the system?",
+      "why": "20 weakly-connected nodes found - possible documentation gaps or missing edges."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 0` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.10204081632653061 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 1` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.07862679955703211 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 2` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.07956989247311828 - nodes in this community are weakly interconnected."
+    }
+  ]
+}

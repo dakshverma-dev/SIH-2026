@@ -49,6 +49,22 @@ cd backend && ../.venv/bin/uvicorn app.main:app --reload --port 8000
 
 Swagger: <http://localhost:8000/docs> · Health: `/api/v1/health`
 
+Serve on `--host 0.0.0.0` and teammates reach it at `http://<your-lan-ip>:8000/api/v1`.
+
+### Endpoint names
+
+The team contract calls a captured source a **FieldUpdate** and reads it from **`/updates`**.
+`CapturedSource` / `/sources` are the same objects under the original names -- both are live,
+so neither side had to migrate:
+
+| Team contract | Equivalent |
+|---|---|
+| `POST /updates` | `POST /ingest/text` |
+| `GET /updates` | `GET /sources` |
+| `GET /updates/{id}` | `GET /sources/{id}` |
+
+`GET /events?trust=REVIEW` is the planner review queue.
+
 ## Smoke test
 
 ```bash
@@ -76,12 +92,40 @@ curl -s -X POST localhost:8000/api/v1/extract/raw \
 Override with `P2R_<USER>_PASSWORD` before seeding. Passwords are bcrypt-hashed;
 `JWT_SECRET` must be changed before anything leaves localhost.
 
+## Measured results
+
+`extract-v6`, temperature 0.0, Train split (14 cases). Reproduce with the commands below;
+nothing here is estimated.
+
+| Metric | Result |
+|---|---|
+| Valid JSON rate | 14/14 (100%) |
+| Trust decision match | 13/14 (93%) |
+| Discipline accuracy | 14/14 (100%) |
+| Location accuracy | 14/14 (100%) |
+| Hallucination flags | 0 |
+| Conflict type + action | 9/9 completed (100%) |
+| Processing time | median 8.5 s/report |
+| Repeatability | identical across 3 consecutive runs |
+
+The single decision miss (B014, "Cable pulling in Substation B finished.") is a boundary,
+not a defect: `expected_decision` in the sheet pairs with `expected_activity_id`, so it is a
+*post-match* answer, while this service emits *pre-match* trust. Telling "no asset tag but
+unambiguous" (B014 -> MATCH) from "no asset tag and two candidate assets" (B016 -> REVIEW)
+requires the schedule candidate set and their action verbs, which belong to the matcher.
+A false MATCH auto-posts wrong progress; a false REVIEW costs one planner click -- so this
+gate stays conservative. 93% is the honest ceiling for a pre-match gate scored against a
+post-match key.
+
+Not measured here: activity-matching accuracy and schedule-impact accuracy (matcher / CPM).
+
 ## Tests & benchmark
 
 ```bash
 cd backend
 ../.venv/bin/python -m pytest tests/ -q                          # 38 tests, offline, no API key
-../.venv/bin/python scripts/evaluate_extraction.py --split Train # tuning
+../.venv/bin/python scripts/evaluate_extraction.py --split Train \
+    --json-out benchmark-out/train.json                          # tuning
 ../.venv/bin/python scripts/evaluate_extraction.py --split Test  # held out; run once
 ../.venv/bin/python scripts/evaluate_extraction.py --conflicts   # Conflict_Cases pairs
 ```

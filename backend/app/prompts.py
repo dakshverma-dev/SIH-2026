@@ -12,7 +12,9 @@ provided construction field source.
 Preserve:
 - text, numbers, percentages, dates, times
 - equipment IDs, line IDs, spool IDs, tag numbers
-- table row content
+- table row content, WITH ITS COLUMN BOUNDARIES: output one line per row, cells separated
+  by " | ", and keep the header row. Flattening a table to plain spaces loses which value
+  belongs to which column ("Tank Farm 100" instead of "Tank Farm | 100")
 - handwritten annotations where legible
 
 Do not reinterpret the construction meaning.
@@ -63,7 +65,9 @@ Rules:
 3. Preserve important construction identifiers exactly as written, and put each one in the
    RIGHT field:
    - asset_tag        tagged line/equipment/tank the work is on: P104, P105, T201
-   - foundation_id    foundation marks: F-21
+   - foundation_id    a foundation's OWN mark only: F-21. A tank/vessel/line tag stays in
+                      asset_tag even when the work is on its foundation, so
+                      "tank T-201 foundation excavation" is asset_tag=T-201.
    - equipment_id     pumps, motors, vessels: P-201, MCC-1
    - instrument_id    instrument tags: PT-104
    - cable_id         cable numbers
@@ -71,8 +75,16 @@ Rules:
    - size             nominal size: 24 in, 18 in
    An identifier you cannot classify goes in "other" with a descriptive key. Never drop one.
 4. Normalize informal wording into a concise activity description.
-5. Determine discipline only when reasonably supported. Weld inspection and NDT are
-   "quality", not "piping".
+5. Discipline is the TRADE THAT PERFORMS THE WORK. Choose it whenever the trade is clear
+   from the work described; use "unknown" only when the report is too vague to tell which
+   trade did anything (e.g. "work progressing normally"). Never return "unknown" merely
+   because the exact activity is unusual.
+   Everything done by the piping crew is "piping" -- fabrication, transport/delivery of
+   spools, support installation, erection, flange bolting, hydrotest, pneumatic test,
+   punch-point clearance. The one piping-adjacent exception is inspection: weld inspection,
+   joint inspection and NDT are "quality".
+   Excavation, concrete and foundations are "civil". Cable pulling, termination and
+   glanding are "electrical". Instrument loops and tag calibration are "instrumentation".
 6. If a value cannot be determined, use null or "unknown".
 7. Preserve the exact source sentence as evidence.
 8. Status must follow the evidence:
@@ -176,8 +188,19 @@ FEWSHOT: list[tuple[str, str]] = [
 ]
 
 
-def extraction_messages(text: str) -> list[dict]:
+DATE_CONTEXT = (
+    "Today is {today}. Resolve relative or partial dates against it and return event_date as "
+    "YYYY-MM-DD: 'today' -> {today}, 'yesterday' -> the day before, '27 Aug' -> 27 August of "
+    "the year that makes it the most recent past date. If no date is mentioned at all, "
+    "event_date stays null -- never invent one."
+)
+
+
+def extraction_messages(text: str, reference_date=None) -> list[dict]:
     msgs: list[dict] = [{"role": "system", "content": EXTRACTION_SYSTEM}]
+    if reference_date is not None:
+        msgs.append({"role": "system",
+                     "content": DATE_CONTEXT.format(today=reference_date.isoformat())})
     for user, assistant in FEWSHOT:
         msgs.append({"role": "user", "content": user})
         msgs.append({"role": "assistant", "content": " ".join(assistant.split())})

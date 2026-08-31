@@ -14,7 +14,7 @@ from .agents import ExtractionError
 from .config import settings
 from .db import ActivityRow, AuditRow, EventRow, SourceRow, User, get_session
 from .schemas import (
-    PROMPT_VERSION, CapturedSource, EvidenceResponse, ExecutionEvent, ExtractRequest,
+    PROMPT_VERSION, CapturedSource, EvidenceResponse, FieldUpdate, ExecutionEvent, ExtractRequest,
     ExtractionResult, HealthResponse, IngestTextRequest, LoginRequest, RawExtractRequest,
     Role, ScheduleActivity, ScheduleImportResponse, SourceType, TokenResponse, TrustDecision,
 )
@@ -59,6 +59,8 @@ def me(user: User = Depends(auth.current_user)):
 
 
 # ─────────────────────────── ingestion ───────────────────────────
+@router.post("/updates", response_model=FieldUpdate, tags=["ingestion"],
+             summary="Capture a field update from text (alias of /ingest/text)")
 @router.post("/ingest/text", response_model=CapturedSource, tags=["ingestion"],
              summary="Capture a free-text field update / DPR line")
 def ingest_text(body: IngestTextRequest, db: Session = Depends(get_session),
@@ -143,6 +145,8 @@ async def ingest_image(project_id: str = Form(..., examples=["PRJ-001"]),
     return _store_binary(db, project_id, name, ext, data, user.username, SourceType.image)
 
 
+@router.get("/updates", response_model=list[FieldUpdate], tags=["ingestion"],
+            summary="List captured field updates (alias of /sources -- team contract name)")
 @router.get("/sources", response_model=list[CapturedSource], tags=["ingestion"])
 def list_sources(project_id: str | None = None, source_type: SourceType | None = None,
                  limit: int = Query(50, le=500), db: Session = Depends(get_session),
@@ -155,6 +159,8 @@ def list_sources(project_id: str | None = None, source_type: SourceType | None =
     return [CapturedSource.model_validate(r) for r in db.execute(q).scalars().all()]
 
 
+@router.get("/updates/{source_id}", response_model=FieldUpdate, tags=["ingestion"],
+            summary="One field update (alias of /sources/{id})")
 @router.get("/sources/{source_id}", response_model=CapturedSource, tags=["ingestion"])
 def get_source(source_id: str, db: Session = Depends(get_session),
                user: User = Depends(auth.can_read)):

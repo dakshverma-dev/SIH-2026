@@ -1,0 +1,48 @@
+%% Plan2Reality — Capture & Understand layer (SIH26122)
+%% Renders natively on GitHub, GitLab, Notion, Obsidian, mermaid.live
+flowchart LR
+  subgraph IN["field reality"]
+    T["text / DPR line"]
+    X["Excel · CSV"]
+    P["photo of a DPR"]
+    V["voice note"]
+  end
+
+  T --> CAP
+  X --> CAP
+  P --> CAP
+  V --> CAP
+
+  subgraph MINE["my scope — capture &amp; understand"]
+    CAP["CAPTURE<br/><i>CapturedSource</i>"]
+    OCR["NANO OMNI<br/><i>nano-omni-30b</i><br/>transcription only"]
+    NRM["NORMALIZE<br/><i>NormalizedFieldInput</i><br/>ontology surface rules"]
+    SEG["SEGMENT<br/><i>super-120b</i><br/>1 report → N spans"]
+    EXT["EXTRACT<br/><i>super-120b</i><br/>1 span → 1 event"]
+    VAL["VALIDATE + TRUST<br/>no model — rules<br/>10 conflict types"]
+    EVT["ExecutionEvent<br/>evidence · confidence<br/>trust · audit trail"]
+  end
+
+  CAP -->|"image / audio only"| OCR
+  OCR -->|"plain text"| NRM
+  CAP -->|"text &amp; Excel skip OCR"| NRM
+  NRM -->|"one text contract"| SEG
+  SEG -->|"spans[]"| EXT
+  EXT -->|"ExtractedEvent[]"| VAL
+  VAL --> EVT
+
+  EVT -->|"MATCH"| AUTO["auto-post to schedule"]
+  EVT -->|"REVIEW"| Q["planner review queue"]
+  EVT -->|"UNMATCHED"| U["planner decides"]
+
+  EVT ==>|"ExecutionEvent<br/>no activity_id assigned"| MATCH["MATCHER<br/>L5/L6 activity"]
+  MATCH --> CPM["CPM · PREDICT<br/>schedule impact"]
+
+  classDef mine fill:#f7f9fa,stroke:#141b20,stroke-width:1.5px,color:#141b20
+  classDef ocr fill:#f2ded4,stroke:#cf4a12,stroke-width:1.5px,color:#141b20
+  classDef out fill:#ffffff,stroke:#cf4a12,stroke-width:2px,color:#141b20
+  classDef inp fill:#dfe5e8,stroke:#55666f,color:#141b20
+  class CAP,NRM,SEG,EXT,VAL mine
+  class OCR ocr
+  class EVT,MATCH,CPM out
+  class T,X,P,V inp

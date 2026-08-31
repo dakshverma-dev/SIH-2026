@@ -11,8 +11,11 @@ import re
 from datetime import date
 from functools import lru_cache
 
+import difflib
+import logging
+
 from .config import settings
-from .ontology import load_variants, normalization_rules
+from .ontology import load_activities, load_variants, normalization_rules
 from .schemas import (
     ConflictAction, ConflictFinding, ConflictType, ExtractedEvent, Status, TrustDecision,
 )
@@ -24,13 +27,26 @@ from .schemas import (
 def _rules() -> tuple[tuple[str, str], ...]:
     try:
         return tuple(normalization_rules(load_variants(settings.ontology_path)))
-    except Exception:      # ontology absent -> normalizer becomes a no-op, never a crash
+    except Exception as e:  # ontology absent -> normalizer no-ops, but say so out loud
+        logging.getLogger("plan2reality.rules").warning("normalization rules unavailable: %r", e)
         return ()
 
 
 # Hyphen variants the ontology does not spell out: it lists "R-3" but the benchmark also
 # writes "Rack-3". Mechanical, so it lives in code rather than waiting on a sheet edit.
 _HYPHEN_LOC = re.compile(r"\b(Rack|Bay|Row|Grid|Line|Unit|Zone)-(\d+)\b", re.I)
+
+
+@lru_cache(maxsize=1)
+def known_locations() -> frozenset[str]:
+    """Locations the schedule actually uses. Mapping "the yard" -> "Fabrication Yard" is a
+    correct canonicalisation, so it must not be punished as a hallucination."""
+    try:
+        acts, _ = load_activities(settings.ontology_path, "ONTOLOGY")
+        return frozenset(a.location.lower() for a in acts if a.location)
+    except Exception as e:
+        logging.getLogger("plan2reality.rules").warning("known_locations unavailable: %r", e)
+        return frozenset()
 
 
 def normalize_text(text: str) -> tuple[str, list[str]]:
@@ -55,9 +71,36 @@ _PCT = re.compile(r"\d+(?:\.\d+)?\s*(?:%|percent|pct)", re.I)
 _FRACTION = re.compile(
     r"\b(\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s+(?:of|out of)\s+"
     r"(\d+|one|two|three|four|five|six|seven|eight|nine|ten)\b", re.I)
+# Completion verbs, by discipline. Material-movement activities finish with "delivered" /
+# "shifted", not "completed" -- benchmark B007 (PIP-323 is a Material movement activity).
 _COMPLETE_WORDS = re.compile(
     r"\b(complete|completed|completion|finished|closed|erected|done|fixed|poured|cast|"
-    r"installed|terminated|pulled|tested|cleared)\b", re.I)
+    r"casting|installed|terminated|pulled|tested|cleared|delivered|shifted|moved|"
+    r"transported|placed|excavated|welded|glanded|bolted|tightened|commissioned|"
+    r"handed over|in place)\b", re.I)
+
+
+# Past-tense VERBS only. Activity nouns ("erection", "completion", "casting") must stay out:
+# "piping erection started" is a start, not a finish, and putting the noun here would make
+# every mention of the activity look like completion evidence.
+_COMPLETE_VOCAB = tuple(sorted({
+    "complete", "completed", "finished", "closed", "erected", "done", "fixed", "poured",
+    "installed", "terminated", "pulled", "tested", "cleared", "delivered", "shifted",
+    "moved", "transported", "placed", "excavated", "welded", "glanded", "bolted",
+    "tightened", "commissioned",
+}))
+
+
+def _says_complete(evidence: str) -> bool:
+    """Completion language, typo-tolerant. Benchmark B005 writes 'ercted' for 'erected' and
+    is expected to still resolve -- demanding exact spelling from a field report is how you
+    manufacture false hallucination flags."""
+    if _COMPLETE_WORDS.search(evidence):
+        return True
+    for tok in re.findall(r"[a-z]{5,}", evidence.lower()):
+        if difflib.get_close_matches(tok, _COMPLETE_VOCAB, n=1, cutoff=0.85):
+            return True
+    return False
 
 
 def validate_event(ev: ExtractedEvent) -> list[str]:
@@ -73,14 +116,15 @@ def validate_event(ev: ExtractedEvent) -> list[str]:
 
     if ev.progress_percent is not None:
         stated = bool(_PCT.search(ev.evidence) or _FRACTION.search(ev.evidence))
-        complete = bool(_COMPLETE_WORDS.search(ev.evidence))
+        complete = _says_complete(ev.evidence)
         if not stated and not complete:
             warns.append("progress_not_supported_by_evidence")
         elif not stated and ev.progress_percent not in (0, 100):
             warns.append("progress_inferred_without_explicit_number")
 
-    if ev.location and ev.location.lower() not in ev_low:
-        warns.append(f"location_not_verbatim_in_evidence: {ev.location}")
+    if (ev.location and ev.location.lower() not in ev_low
+            and ev.location.lower() not in known_locations()):
+        warns.append(f"location_not_in_evidence_or_schedule: {ev.location}")
 
     if ev.status == Status.completed and ev.progress_percent not in (None, 100):
         warns.append(f"status_completed_but_progress={ev.progress_percent}")
@@ -104,7 +148,41 @@ _ACTION = ConflictAction  # local alias for brevity below
 
 
 def _tokens(s: str) -> set[str]:
-    return {w for w in re.findall(r"[a-z0-9]+", (s or "").lower()) if len(w) > 3 and w not in _STOP}
+    """Tokens truncated to 4 chars so morphology does not break pairing:
+    'hydrostatic test' and 'hydrotest' both reduce to {hydr, test} (benchmark C004), and
+    'casting'/'cast' or 'testing'/'test' collapse the same way.
+    ponytail: crude stemmer, deliberately. Swap in the ontology's canonical_term lookup if
+    a real collision shows up -- 4 chars keeps 'pipi'(piping) and 'pipe' distinct, which is
+    what we want, and 'cable pulling' vs 'cable termination' still score below threshold."""
+    return {w[:4] for w in re.findall(r"[a-z0-9]+", (s or "").lower())
+            if len(w) > 3 and w not in _STOP}
+
+
+@lru_cache(maxsize=1)
+def _variant_index() -> tuple[tuple[frozenset, str], ...]:
+    """Terminology_Variants -> (prefix-4 token set, default_activity_id), longest first.
+    Lets 'foundation casting' (V035) and 'concrete poured' (V034) both resolve to CIV-113,
+    which raw token overlap cannot do."""
+    try:
+        idx = [(frozenset(_tokens(v.reported_phrase)), v.default_activity_id)
+               for v in load_variants(settings.ontology_path) if v.default_activity_id]
+        return tuple(sorted(((t, a) for t, a in idx if t), key=lambda r: -len(r[0])))
+    except Exception as e:
+        logging.getLogger("plan2reality.rules").warning("variant index unavailable: %r", e)
+        return ()
+
+
+def canonical_activity(desc: str) -> str | None:
+    """Which schedule activity does this wording point at, per Preethy's variant table?
+    A hint only -- the matcher decides for real. Used here to pair two reports of the
+    same physical work when they use different words."""
+    toks = _tokens(desc)
+    if not toks:
+        return None
+    for phrase_toks, activity_id in _variant_index():
+        if phrase_toks <= toks:
+            return activity_id
+    return None
 
 
 def same_work(a: ExtractedEvent, b: ExtractedEvent) -> bool:
@@ -114,6 +192,10 @@ def same_work(a: ExtractedEvent, b: ExtractedEvent) -> bool:
     ta, tb = a.identifiers.asset_tag, b.identifiers.asset_tag
     if ta and tb and ta.lower() != tb.lower():
         return False
+    ca, cb = (canonical_activity(a.activity_description),
+              canonical_activity(b.activity_description))
+    if ca and cb:
+        return ca == cb          # ontology is more reliable than word overlap
     wa, wb = _tokens(a.activity_description), _tokens(b.activity_description)
     if not wa or not wb:
         return False

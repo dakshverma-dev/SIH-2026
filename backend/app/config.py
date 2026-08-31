@@ -17,12 +17,13 @@ class Settings(BaseSettings):
     nvidia_base_url: str = "https://integrate.api.nvidia.com/v1"
     ocr_model: str = "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning"       # input understanding only
     reasoning_model: str = "nvidia/nemotron-3-super-120b-a12b"             # all business reasoning
-    extraction_temperature: float = 0.1
+    extraction_temperature: float = 0.0   # extraction, not creativity: 0.0 for repeatability
     ocr_temperature: float = 0.0
     enable_thinking: bool = True
     max_tokens: int = 2048
     request_timeout: float = 90.0
-    transport_retries: int = 2      # SDK-level, transient only
+    transport_retries: int = 4      # SDK-level, transient only. Measured ~7% 500s from
+                                    # the endpoint, so 2 was not enough for a live demo.
     schema_repair_retries: int = 1  # "your JSON was invalid" round-trips
 
     # --- trust gate thresholds (Benchmark_Events decides MATCH/REVIEW/UNMATCHED) ---

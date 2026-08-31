@@ -9,7 +9,7 @@ from enum import Enum
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-PROMPT_VERSION = "extract-v2"
+PROMPT_VERSION = "extract-v6"
 VALIDATOR_VERSION = "rules-v1"
 
 
@@ -95,6 +95,12 @@ class CapturedSource(BaseModel):
     event_timestamp: datetime | None = None
     submitted_by: str | None = None
     meta: dict = Field(default_factory=dict)
+
+
+# The team contract (Daksh's lib/api) calls a captured source a "FieldUpdate" and reads it
+# from GET /updates. Same object, agreed name -- alias rather than a rename so nothing that
+# already speaks CapturedSource/{/sources} breaks.
+FieldUpdate = CapturedSource
 
 
 class NormalizedFieldInput(BaseModel):

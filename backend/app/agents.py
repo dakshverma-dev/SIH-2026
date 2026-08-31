@@ -119,9 +119,9 @@ def segment(text: str) -> list[str]:
 
 
 # ─────────────────────── EXTRACTOR AGENT (Super 120B) ───────────────────────
-def extract_event(span: str) -> ExtractedEvent:
+def extract_event(span: str, reference_date=None) -> ExtractedEvent:
     """One span -> one validated ExtractedEvent. One schema-repair round-trip allowed."""
-    messages = extraction_messages(span)
+    messages = extraction_messages(span, reference_date)
     raw = _chat(settings.reasoning_model, messages, settings.extraction_temperature)
     for attempt in range(settings.schema_repair_retries + 1):
         try:
@@ -141,7 +141,8 @@ def extract_event(span: str) -> ExtractedEvent:
     raise ExtractionError("unreachable")
 
 
-def extract_events(text: str) -> tuple[list[ExtractedEvent], list[dict], dict]:
+def extract_events(text: str, reference_date=None
+                   ) -> tuple[list[ExtractedEvent], list[dict], dict]:
     """Segment then extract each span. One bad span fails alone.
     Returns (events, failures, trace)."""
     t0 = time.perf_counter()
@@ -154,13 +155,13 @@ def extract_events(text: str) -> tuple[list[ExtractedEvent], list[dict], dict]:
     failures: list[dict] = []
     if len(spans) == 1:
         try:
-            events.append(extract_event(spans[0]))
+            events.append(extract_event(spans[0], reference_date))
         except ExtractionError as e:
             failures.append({"span_index": 0, "span": spans[0], "reason": str(e)})
     else:
         with ThreadPoolExecutor(max_workers=min(len(spans), 6)) as pool:
             for i, (span, fut) in enumerate(
-                    [(s, pool.submit(extract_event, s)) for s in spans]):
+                    [(s, pool.submit(extract_event, s, reference_date)) for s in spans]):
                 try:
                     events.append(fut.result())
                 except ExtractionError as e:

@@ -326,3 +326,80 @@ def test_one_bad_span_does_not_kill_the_batch(monkeypatch):
         "P104 supports complete at Rack 3. Spool erection started at Rack 3.")
     assert len(events) == 1 and len(failures) == 1
     assert trace["segmenter"]["spans"] == 2
+
+
+# ─────────────────── v3 regressions (found by the Train benchmark) ───────────────────
+def test_hyphenated_location_is_normalised():
+    """Benchmark writes 'Rack-3'; the ontology only lists 'R-3'."""
+    out, applied = rules.normalize_text("P104 24-inch spool erected at Rack-3.")
+    assert "Rack 3" in out and applied
+
+
+def test_canonicalised_location_is_not_a_hallucination(onto):
+    """B026: model maps 'in the yard' -> 'Fabrication Yard'. That is correct, not invented."""
+    rules.known_locations.cache_clear()
+    e = ev("piping spool fabrication", "P104 spool fabrication completed in the yard.", 0.92,
+           location="Fabrication Yard", progress_percent=100,
+           identifiers=Identifiers(asset_tag="P104"))
+    assert rules.validate_event(e) == []
+
+
+def test_invented_location_is_still_flagged(onto):
+    rules.known_locations.cache_clear()
+    e = ev("erection", "work at Rack 3.", 0.9, location="Atlantis",
+           identifiers=Identifiers(asset_tag="P104"))
+    assert any(w.startswith("location_not_in_evidence_or_schedule") for w in rules.validate_event(e))
+
+
+@pytest.mark.parametrize("evidence", [
+    "P104 spool delivered to the Rack 3 workfront.",      # B007: movement activity
+    "T201 foundation casting finished today.",            # B013: regional terminology
+    "The 24 in header near Rack 3 is now in place.",      # B006: natural language
+])
+def test_discipline_specific_completion_verbs(evidence):
+    """100% progress on a completion verb must not be called unsupported just because the
+    verb is not the word 'completed'."""
+    e = ev("work", evidence, 0.9, progress_percent=100,
+           identifiers=Identifiers(asset_tag="P104"))
+    assert "progress_not_supported_by_evidence" not in rules.validate_event(e)
+
+
+# ─────────────────── activity pairing (Conflict_Cases C004 + V034/V035) ───────────────────
+@pytest.mark.parametrize("desc_a,desc_b,expected,why", [
+    ("hydrostatic test", "hydrotest", True, "C004: morphology must still pair"),
+    ("foundation concrete pour", "foundation casting", True, "V034/V035 both -> CIV-113"),
+    ("spool erected", "line erection", True, "V001/V003 both -> PIP-324"),
+    ("piping spool erection", "pipe support installation", False, "PIP-324 vs PIP-322"),
+    ("cable pulling", "cable termination", False, "ELE-341 vs ELE-342"),
+    ("piping spool erection", "hydrostatic testing", False, "PIP-324 vs PIP-326"),
+    ("piping spool erection", "foundation excavation", False, "cross-discipline"),
+])
+def test_activity_pairing(onto, desc_a, desc_b, expected, why):
+    rules._variant_index.cache_clear()
+    assert rules.same_work(ev(desc_a, "e", identifiers=Identifiers(asset_tag="P104")),
+                           ev(desc_b, "e", identifiers=Identifiers(asset_tag="P104"))) is expected, why
+
+
+def test_variant_index_is_actually_populated(onto):
+    """Guards a silent failure: a bare except once made this return () and every
+    ontology-based pairing quietly fell back to word overlap."""
+    rules._variant_index.cache_clear()
+    assert len(rules._variant_index()) > 30
+    assert rules.canonical_activity("foundation casting") == "CIV-113"
+
+
+@pytest.mark.parametrize("evidence", [
+    "P104 spoll ercted at Rack 3 today.",       # B005: typo case, expected MATCH
+    "P104 spool erected at Rack 3.",
+    "T201 foundation casting finished today.",
+])
+def test_completion_language_is_typo_tolerant(evidence):
+    e = ev("erection", evidence, 0.9, progress_percent=100,
+           identifiers=Identifiers(asset_tag="P104"))
+    assert "progress_not_supported_by_evidence" not in rules.validate_event(e)
+
+
+def test_typo_tolerance_does_not_accept_unrelated_words():
+    e = ev("erection", "P104 material awaited at Rack 3.", 0.9, progress_percent=100,
+           identifiers=Identifiers(asset_tag="P104"))
+    assert "progress_not_supported_by_evidence" in rules.validate_event(e)
