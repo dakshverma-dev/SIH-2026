@@ -1,0 +1,27 @@
+%% Plan2Reality — trust gate. First check that trips decides the verdict.
+flowchart TD
+  E["extracted event<br/>confidence · identifiers · conflicts"] --> C1
+
+  C1{"conflict raised<br/>FLAG or REVIEW?"} -->|yes| R1["REVIEW"]
+  C1 -->|no| C2
+
+  C2{"more than one activity<br/>in one report?"} -->|yes| R2["REVIEW"]
+  C2 -->|no| C3
+
+  C3{"identifier or progress<br/>absent from the evidence?"} -->|yes| R3["REVIEW"]
+  C3 -->|no| C4
+
+  C4{"confidence below 0.50?"} -->|yes| UM["UNMATCHED<br/>no candidate"]
+  C4 -->|no| C5
+
+  C5{"no asset tag, or<br/>confidence below 0.85?"} -->|yes| R4["REVIEW"]
+  C5 -->|no| OK["MATCH — auto-post"]
+
+  classDef rev fill:#ffffff,stroke:#91620a,stroke-width:1.6px,color:#91620a
+  classDef unm fill:#ffffff,stroke:#55666f,stroke-width:1.6px,color:#55666f
+  classDef ok  fill:#ffffff,stroke:#14654a,stroke-width:2.2px,color:#14654a
+  classDef q   fill:#f7f9fa,stroke:#141b20,color:#141b20
+  class R1,R2,R3,R4 rev
+  class UM unm
+  class OK ok
+  class C1,C2,C3,C4,C5,E q

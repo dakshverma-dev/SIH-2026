@@ -1,0 +1,18 @@
+# Backend / Python
+.venv/
+__pycache__/
+*.pyc
+*.db
+uploads/
+.pytest_cache/
+benchmark-out/
+
+# Frontend / Next.js
+node_modules/
+.next/
+*.tsbuildinfo
+.claude
+
+# Environment files
+.env*
+!.env.example
