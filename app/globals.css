@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #0b0f14;
+  --panel: #11161d;
+  --panel-2: #161c25;
+  --border: #232b36;
+  --text: #e6e9ee;
+  --muted: #8b95a3;
+  --accent: #3aa0ff;
+  --accent-2: #22c07a;
+  --warn: #e2a53a;
+  --danger: #e5484d;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+.p2r-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.p2r-panel {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.p2r-mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  border: 1px solid var(--border);
+}
+
+.badge-high { color: #22c07a; border-color: #1c5c40; background: #0e1f17; }
+.badge-medium { color: #e2a53a; border-color: #5c4a1c; background: #221b0e; }
+.badge-low { color: #e5484d; border-color: #5c1c1e; background: #220e0f; }
+.badge-info { color: #3aa0ff; border-color: #1c3d5c; background: #0e1a22; }
+.badge-neutral { color: #8b95a3; border-color: var(--border); background: var(--panel); }
+
+table { border-collapse: collapse; width: 100%; }
+th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); padding: 10px 12px; border-bottom: 1px solid var(--border); }
+td { padding: 10px 12px; border-bottom: 1px solid var(--border); font-size: 13.5px; }
+tr:hover td { background: rgba(255,255,255,0.015); }
+
+a { color: inherit; }
