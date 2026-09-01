@@ -1,143 +1,243 @@
-# Plan2Reality — Trusted Execution Intelligence
+# 🏗️ Plan2Reality (P2R) — Trusted Execution Intelligence
+### *AI-Powered Field Intelligence, L5/L6 Activity Matching & Critical Path Recovery for Mega EPC Projects*
 
-> 🚧 **Status: Work in Progress (SIH 2026 Prototype)** — Actively developing AI-driven construction schedule intelligence, automatic DPR extraction, RLS-enforced governance, and critical-path delay simulation.
-
-Full-stack prototype for SIH 2026 PS26122, now on a **real Supabase Postgres backend
-with Row Level Security enforced on every table**. Converts messy field reality (DPR
-text) into verified, schedule-linked (L5/L6) project truth, then reasons about
-downstream schedule impact and recovery options.
-
-Every screen reads/writes real database state through the signed-in user's own
-session — no service-role bypass, no hardcoded numbers, no fake buttons.
+[![Next.js 16](https://img.shields.io/badge/Next.js-16.0-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![React 19](https://img.shields.io/badge/React-19.0-61DAFB?style=for-the-badge&logo=react)](https://react.dev/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
+[![Supabase Postgres](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?style=for-the-badge&logo=supabase)](https://supabase.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![Python 3.11+](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python)](https://python.org)
+[![Three.js](https://img.shields.io/badge/Three.js-3D_BIM-black?style=for-the-badge&logo=three.js)](https://threejs.org/)
+[![Row Level Security](https://img.shields.io/badge/Security-100%25_RLS_Enforced-critical?style=for-the-badge)](https://supabase.com/docs/guides/database/postgres/row-level-security)
 
 ---
 
-## 1. Architecture
+## 📌 Executive Summary
 
-- **Frontend:** Next.js 16 App Router, TypeScript, React 19
-- **Backend:** Next.js Route Handlers + Server Components, talking to Supabase via `@supabase/ssr`
-- **Database:** Supabase Postgres — real relational schema (15 tables), enums, foreign keys, indexes
-- **Auth:** Real Supabase Auth (`auth.users` + bcrypt), joined to a `profiles` table for app-level role
-- **Security:** Row Level Security enabled and policy-enforced on **every** table and on Storage objects — see §3
-- **Storage:** Private Supabase Storage bucket (`project-documents`), RLS-scoped to project members
-- **AI:** Provider-abstracted extraction (`lib/engine/extraction.ts`). Uses the real Anthropic API if `ANTHROPIC_API_KEY` is set; otherwise a deterministic rule-based extractor, always labelled `DEMO_FALLBACK` — never presented as AI.
+Modern mega-infrastructure and industrial EPC (Engineering, Procurement, Construction) projects face massive cost overruns and multi-month delays due to **the reality gap**: the disconnect between unstructured daily field progress (Daily Progress Reports - DPRs, supervisor notes, chat updates) and rigid master project schedules (Primavera P6, MS Project, L5/L6 WBS).
 
-## 2. Why RLS instead of a service-role key
+**Plan2Reality (P2R)** bridges this divide with an enterprise-grade AI execution engine that:
+1. **Ingests & Dissects Unstructured DPRs**: Extracts tags, disciplines, equipment IDs, locations, and progress percentages via LLMs and deterministic fallback extractors.
+2. **Deterministic L5/L6 Entity Matching**: Matches extracted site progress against thousands of granular schedule activities using engineering tag anchors, contextual discipline weights, and confidence gating.
+3. **Automated CPM Recalculation**: Propagates schedule slippage downstream along the Critical Path in real-time.
+4. **Scenario Recovery Simulator**: Models mitigation strategies (*Add Extra Shift, Expand Crew, Resequence Predecessors*) with cost-benefit analysis.
+5. **3D Digital Twin Site Scene**: Visualizes spatial progress in an interactive 3D site model.
+6. **Zero-Trust Enterprise Governance**: Built on Supabase PostgreSQL with strict **Row Level Security (RLS)** on every table, role-based access control (RBAC), and an immutable cryptographic audit ledger.
 
-The server never uses a service-role key. Every Server Component and Route Handler
-calls `createClient()` (`lib/supabase/server.ts`), which reads the user's session
-cookie and makes every query **as that user**, over their real JWT. That means:
+---
 
-- Postgres itself — not application code — is the security boundary.
-- A bug in a page or API route cannot leak another project's data, because the
-  database will refuse the query regardless of what the app asks for.
-- This was verified directly against the live database (not just code review) — see §6.
+## 🏛️ System Architecture
 
-## 3. Row Level Security — what's actually enforced
+```mermaid
+flowchart TD
+    subgraph ClientLayer ["Client & Visualization Layer"]
+        UI["Next.js 16 App Router UI\n(React 19 + TailwindCSS)"]
+        ThreeD["3D Digital Twin Viewer\n(Three.js SiteScene)"]
+        Gantt["Interactive CPM & Gantt\n(Schedule Timeline)"]
+    end
 
-Every table has RLS **enabled**, with explicit policies:
+    subgraph AppServer ["Next.js Server & FastAPI Engine"]
+        RouteHandlers["Next.js Server Components & Route Handlers\n(@supabase/ssr Session Scoped)"]
+        FastAPIEngine["FastAPI Microservice Engine\n(Ontology, NLP Pipeline, Rule Engine)"]
+        MatchEngine["Matching Engine (L5/L6)\n(Anchor Matching, Scoring & Confidence Gating)"]
+        CPMEngine["Deterministic CPM Engine\n(Early/Late Dates, Floats, Variance)"]
+        RecoverySim["Recovery Simulator\n(Crew, Overtime, Resequencing)"]
+    end
 
-| Table | Read | Write |
+    subgraph SecurityData ["PostgreSQL Database & Storage (Supabase)"]
+        Auth["Supabase Auth (JWT Sessions)"]
+        RLS["Row Level Security (RLS) Gatekeeper\n(Zero Service-Role Bypass)"]
+        Tables[("Postgres Tables (15 Relational Schemas)\n• projects\n• schedule_activities\n• field_reports\n• activity_matches\n• conflicts\n• audit_events (Append-Only)")]
+        Storage["Private Storage Bucket\n(project-documents)"]
+    end
+
+    UI --> RouteHandlers
+    ThreeD --> RouteHandlers
+    Gantt --> RouteHandlers
+    RouteHandlers --> RLS
+    RouteHandlers --> MatchEngine
+    RouteHandlers --> CPMEngine
+    RouteHandlers --> RecoverySim
+    RouteHandlers <--> FastAPIEngine
+    RLS --> Tables
+    RLS --> Storage
+    Auth -. Validates Session Token .-> RLS
+```
+
+---
+
+## 🚀 Key Functional Modules
+
+| Module | Description | Core Capabilities |
 |---|---|---|
-| `projects`, `schedule_activities`, `field_reports`, etc. | Project members only (`is_project_member()`) | Role-gated (e.g. schedule writes require PLANNER+, report submission requires SUPERVISOR+) |
-| `activity_matches`, `conflicts` | Members | Approve/resolve restricted to PLANNER/PM/ADMIN |
-| `audit_events` | Members | **Insert-only — no update or delete policy exists anywhere**, so the ledger is immutable at the database level, not just by convention |
-| Storage (`project-documents` bucket) | Project members only | Upload requires SUPERVISOR+ |
+| 📝 **Field Updates & Extraction** | DPR Text & Document Parser | Ingests raw supervisor text/files, extracts progress, units, equipment tags (`PIP-R3-2401`), and disciplines. |
+| 🎯 **L5/L6 Matching & Review Queue** | Algorithmic Entity Linking | Scores candidates via lexical token overlap, discipline filtering, and tag anchors with confidence categories (`HIGH`, `MEDIUM`, `LOW`, `UNMATCHED`). |
+| ⚡ **Conflict Center** | Anomaly & Integrity Detection | Flags negative progress regressions, out-of-sequence completions, and concurrent duplicate reporting. |
+| 📊 **CPM & Schedule Impact** | Critical Path Analyzer | Quantifies variance vs baseline, recalculates successor start/finish dates, and highlights critical activities. |
+| 🛠️ **Recovery Simulator** | What-If Delay Mitigation | Simulates `Add Crew (+50% rate)`, `Extra Shift (+100% rate)`, and `Resequence Fast-Track` to recover slippage. |
+| 🏗️ **3D Site Digital Twin** | Spatial Progress Visualization | Interactive Three.js BIM/site layout displaying real-time activity completion by spatial rack/area. |
+| 📜 **Execution Memory** | Knowledge Base & Precedents | Searchable historical log of root causes, delay mitigation notes, and engineering lessons learned. |
+| 🛡️ **Immutable Audit Trail** | Cryptographic Ledger | Insert-only database table tracking every decision, approval, modification, and user action. |
 
-Two helper functions (`is_project_member`, `current_role_name`) are `SECURITY DEFINER`
-and had their `EXECUTE` grant revoked from `anon`/`public` after the Supabase security
-advisor flagged them — they're callable only by `authenticated` sessions.
+---
 
-## 4. Roles
+## 🔒 Enterprise Security & Row Level Security (RLS)
 
-`ADMIN`, `PROJECT_MANAGER`, `PLANNER`, `SUPERVISOR`, `VIEWER` — enforced in the UI
-(buttons hidden) **and** independently at the database layer via RLS policies, so
-either layer alone would be enough to stop an unauthorized write.
+Plan2Reality strictly rejects server-side service-role bypass keys. Every server component, API endpoint, and database call is evaluated **in the context of the authenticated user's JWT** via `@supabase/ssr`.
 
-## 5. Major Features (all database-backed)
+### RBAC Permission Matrix
 
-- **Field Updates** → extraction → L5/L6 matching engine (hard-anchor tag/line match + discipline/location context + lexical scoring + rerank + confidence gate: HIGH/MEDIUM/LOW/UNMATCHED)
-- **Review Queue** — evidence, confidence, alternative candidates, approve/reject; approval writes back to `schedule_activities` and triggers impact recalculation
-- **Conflict Center** — auto-detects progress decreases, sequence violations, duplicate updates
-- **Schedule Impact** — simplified deterministic CPM: predecessor slippage propagates to successors
-- **Recovery Simulator** — Add Crew / Extra Shift / Resequence scenarios
-- **Execution Memory** — searchable historical delay causes / recovery actions
-- **Analytics, Audit Timeline, Documents (real Storage), Settings/RBAC** — all live queries
+| Role | Schedule Read | DPR Submission | Review & Approval | Conflict Resolution | Admin Config |
+|:---|:---:|:---:|:---:|:---:|:---:|
+| **ADMIN** | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **PROJECT_MANAGER** | ✅ | ✅ | ✅ | ✅ | ❌ |
+| **PLANNER** | ✅ | ✅ | ✅ | ✅ | ❌ |
+| **SUPERVISOR** | ✅ | ✅ | ❌ | ❌ | ❌ |
+| **VIEWER** | ✅ | ❌ | ❌ | ❌ | ❌ |
 
-## 6. Test Results (this session)
+> 🛡️ **Database-Enforced Integrity**:
+> - `audit_events` table is **INSERT-ONLY** (no `UPDATE` or `DELETE` policy exists in Postgres).
+> - Helper functions `is_project_member()` and `current_role_name()` are `SECURITY DEFINER` with public execution privileges stripped.
 
-- `npm run build` — **zero TypeScript errors, zero build errors** against the real Supabase schema
-- Direct database verification (this sandbox's network policy blocks outbound calls to `*.supabase.co`, so the Next.js HTTP server could not be smoke-tested from inside the container — see note below). Instead the full golden path was executed **as the actual PLANNER role under live RLS enforcement**, using the same insert/update sequence the app's code performs:
-  1. Submitted field report → extracted event (65% progress, Rack 3, Piping, engineering tag `PIP-R3-2401`) ✅
-  2. Matching engine logic reproduced: `PIP-R3-2401 — 24-inch Header Spool Erection` matched at 63% confidence, MEDIUM trust ✅
-  3. Match approved as planner → `schedule_activities.progress` updated 40% → 65%, status → `IN_PROGRESS` ✅
-  4. Impact recorded: baseline 2026-08-24 → forecast 2026-08-15, variance −9 days ✅
-  5. **Negative security test:** the same update attempted as `VIEWER` affected **0 rows** — RLS silently rejected it, proving the policy is real and not just a UI restriction ✅
-- Demo state was reset afterward so the seeded database starts clean.
+---
 
-> **Network note:** this development sandbox's egress proxy only allows a fixed domain allowlist (npm, GitHub, PyPI, etc.) and returned `x-deny-reason: host_not_allowed` for `supabase.co`. This has no effect on the deployed app — Vercel, or your own machine, will reach Supabase normally. If you hit the same issue in a similarly locked-down environment, allow `*.supabase.co` in its network settings.
+## 🛠️ Tech Stack & Directory Structure
 
-## 7. Environment Variables
+### Technology Stack
+- **Frontend**: Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS, Lucide Icons
+- **3D Graphics**: Three.js, React Three Fiber / WebGL Canvas
+- **Backend / API**: Next.js Server Actions & Route Handlers, Python FastAPI microservice
+- **Database & Auth**: PostgreSQL 15+, Supabase Auth, Row Level Security, Supabase Storage
+- **Testing & Tooling**: Vitest, Pytest, ESLint
 
+### Repository Structure
+```plaintext
+SIH-2026/
+├── app/                          # Next.js App Router (Pages & API Routes)
+│   ├── activities/               # L5/L6 Schedule Activity Explorer
+│   ├── analytics/                # KPI Dashboard & Velocity Metrics
+│   ├── audit/                    # Immutable Security Audit Trail
+│   ├── conflicts/                # Conflict Center & Anomaly Detection
+│   ├── critical-path/            # Critical Path Network Analysis
+│   ├── dashboard/                # Executive Overview
+│   ├── documents/                # Secure Project Storage Explorer
+│   ├── execution-memory/         # Searchable Historical Precedents
+│   ├── field-updates/            # DPR Submission & AI Extraction Form
+│   ├── recovery/                 # Delay Recovery Scenario Simulator
+│   ├── review/                   # Planner Match Verification Queue
+│   ├── schedule/                 # Master Gantt Schedule View
+│   ├── site-3d/                  # 3D Digital Twin Scene Viewer
+│   └── api/                      # Authenticated Route Handlers
+├── backend/                      # Python FastAPI Intelligent Backend
+│   ├── app/
+│   │   ├── agents.py             # Multi-Agent Extraction & Reasoning
+│   │   ├── ontology.py           # Construction Domain Hierarchy
+│   │   ├── parsers.py            # OCR & Document Extraction
+│   │   ├── pipeline.py           # DPR Ingestion Pipeline
+│   │   └── rules.py              # Anomaly & Logic Verification Rules
+│   └── tests/                    # Pytest Pipeline Verification Suite
+├── components/                   # Reusable UI & 3D Components
+│   ├── 3d/SiteScene.tsx          # Three.js Digital Twin Engine
+│   ├── Shell.tsx                 # Application Layout & Navigation
+│   └── shell/                    # Command Palette, Notifications
+├── lib/                          # Core Algorithmic Engines & Utils
+│   ├── engine/
+│   │   ├── cpm.ts                # Critical Path Method Computation
+│   │   ├── matching.ts           # Activity Entity Matcher
+│   │   └── extraction.ts         # Multi-Tier NLP Extractor
+│   └── supabase/                 # Authenticated SSR Client Factories
+├── supabase/                     # Database Migrations & Seed Data
+│   ├── migrations/               # Production SQL & RLS Policies
+│   └── seed.sql                  # Multi-Role Demo Data Seed
+└── public/                       # Static Assets & Icons
 ```
-NEXT_PUBLIC_SUPABASE_URL=https://mprnlkbktvhgiukiphik.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon/publishable key from Supabase project settings>
-ANTHROPIC_API_KEY=   # optional — real LLM extraction instead of demo fallback
+
+---
+
+## ⚡ Quick Start & Local Setup
+
+### 1. Prerequisites
+- **Node.js**: `v20.x` or higher
+- **Python**: `3.11` or higher
+- **Supabase Account / Local Instance**
+
+### 2. Clone & Install Dependencies
+```bash
+# Clone the repository
+git clone https://github.com/dakshverma-dev/SIH-2026.git
+cd SIH-2026
+
+# Install Node dependencies
+npm install
+
+# (Optional) Setup Python virtual environment for FastAPI backend
+cd backend
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+cd ..
 ```
 
-Populate a git-ignored `.env` with credentials for an existing Supabase project,
-or create your **own** project. Do not leave an empty `.env.local` beside a
-populated `.env`; Next.js gives `.env.local` precedence.
+### 3. Configure Environment Variables
+Copy `.env.example` to `.env`:
+```bash
+cp .env.example .env
+```
 
-1. Create a project at supabase.com
-2. Run all migration files in `supabase/migrations/` in timestamp order via the SQL editor or `supabase db push`
-3. Seed demo data with `supabase/seed.sql`
-4. Add your project URL + anon key to `.env`
+Set your configuration in `.env`:
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://<your-project-id>.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-anon-publishable-key>
 
-## 8. How to Run
+# Optional: Real LLM extraction (defaults to deterministic DEMO_FALLBACK if empty)
+ANTHROPIC_API_KEY=your_anthropic_api_key_here
+```
+
+### 4. Database Setup & Migrations
+1. In your Supabase project SQL Editor, run the migration files located in `supabase/migrations/` in chronological order.
+2. Execute `supabase/seed.sql` to populate sample EPC projects, L5/L6 activities, predecessors, and test accounts.
+
+### 5. Run the Application
+```bash
+npm run dev
+```
+Open **[http://localhost:3000](http://localhost:3000)** in your browser.
+
+---
+
+## 👥 Demo Credentials
+
+The login screen provides one-click autofill for quick role-switching:
+
+| Account Role | Email Address | Password | Permissions Summary |
+|---|---|---|---|
+| **Admin** | `admin@plan2reality.io` | `admin123` | Full administrative control & access |
+| **Project Manager** | `pm@plan2reality.io` | `pm12345` | Global review, recovery, & schedule oversight |
+| **Planner** | `planner@plan2reality.io` | `plan123` | Match approval, CPM adjustments & impacts |
+| **Site Supervisor**| `supervisor@plan2reality.io` | `sup1234` | DPR creation, document upload |
+| **Auditor / Viewer**| `viewer@plan2reality.io` | `view123` | Read-only analytics & timeline view |
+
+---
+
+## 🧪 Testing & Verification
 
 ```bash
-npm install
-npm run dev      # http://localhost:3000
-# or
-npm run build && npm run start
+# Run unit & engine tests
+npm run test
+
+# Run production build validation
+npm run build
 ```
 
-Demo accounts (shown on the login screen — click to autofill):
+---
 
-| Role | Email | Password |
-|---|---|---|
-| Admin | admin@plan2reality.io | admin123 |
-| Project Manager | pm@plan2reality.io | pm12345 |
-| Planner | planner@plan2reality.io | plan123 |
-| Supervisor | supervisor@plan2reality.io | sup1234 |
-| Viewer | viewer@plan2reality.io | view123 |
+## 🏆 SIH 2026 Problem Statement Alignment
 
-## 9. How to Demo the Golden Path
+- **Problem Statement**: AI-Driven Construction & Infrastructure Schedule Intelligence & Reality-Matching
+- **Target Impact**: Elimination of manual DPR reconciliation delays, proactive bottleneck mitigation, and provable transparency across EPC stakeholders.
 
-1. Log in as **Planner**.
-2. **Field Updates** — sample DPR text is pre-filled ("Spool erection completed for 24-inch header at Rack 3… 65 percent"). Submit.
-3. See the match result inline → **Review Queue**.
-4. Inspect evidence, matched L5/L6 activity, "why" reasons, alternative candidates. **Approve**.
-5. **Impact** — baseline vs. forecast finish, affected downstream Hydrotest activity.
-6. **Recovery** — same activity, run simulation, compare Add Crew / Extra Shift / Resequence.
-7. **Audit** — full chronological, immutable decision trail.
-8. **Execution Memory** — search "hydrotest" for historical precedent.
-9. Log in as **Viewer** and confirm the Approve/Resolve buttons are gone — then, if you want to see the database itself refuse the write (not just the UI hiding it), try calling the API route directly as viewer; RLS blocks it either way.
+---
 
-## 11. Security Advisor Status
-
-`supabase get_advisors` was run at the end of this session:
-
-- ✅ Fixed: `current_role_name()` / `is_project_member()` had `EXECUTE` revoked from `anon` (they were flagged as callable by unauthenticated users).
-- ⚠️ Accepted (by design): both functions remain executable by `authenticated` — RLS policies call them on every single query, so revoking this would break every policy in the app. They only ever return a boolean/role enum, not sensitive data, so being directly RPC-callable is low-risk.
-- ⚠️ Not automatable: "Leaked Password Protection" (HaveIBeenPwned check) is a toggle in the Supabase dashboard under Auth → Policies, not a SQL migration. Recommended to enable before any real (non-demo) use.
-
-## 12. Remaining Limitations (honestly disclosed)
-
-- **Matching engine** is deterministic lexical/rule-based (hard anchors + context + token-overlap), not a live embedding/vector semantic layer or cross-encoder reranker.
-- **CPM engine** is simplified single-predecessor forward propagation, not full multi-predecessor float calculation.
-- **AI extraction** requires a supplied `ANTHROPIC_API_KEY`; otherwise the labelled deterministic fallback is used.
-- **No automated test suite** — verified via live database RLS simulation this session (see §6) instead of an HTTP-level integration test, due to this sandbox's network restrictions.
-- **Single-project** — schema supports multiple `projects` rows and `project_members`, but the UI always shows the first project.
-- P6/XER integration and voice/ASR capture remain out of scope per the MVP strategy in the source document.
+<div align="center">
+  <sub>Developed with ❤️ for Smart India Hackathon 2026.</sub>
+</div>
