@@ -154,3 +154,22 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Hide Lovable badge, widget, and floating tag */
+#lovable-badge,
+[id*="lovable"],
+[class*="lovable"],
+[class*="gpteng"],
+[id*="gpteng"],
+a[href*="lovable.dev"],
+button[aria-label*="lovable" i],
+div[style*="z-index: 2147483647"],
+div[style*="z-index: 999999"],
+#lovable-tag,
+.lovable-badge {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
