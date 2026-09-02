@@ -110,6 +110,53 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const purgeBadges = () => {
+      // 1. Selector-based removal
+      const selectors = [
+        "#lovable-badge",
+        "#lovable-tag",
+        ".lovable-badge",
+        "[class*='lovable']",
+        "[id*='lovable']",
+        "a[href*='lovable.dev']",
+        "button[aria-label*='lovable' i]",
+      ];
+      selectors.forEach((sel) => {
+        try {
+          document.querySelectorAll(sel).forEach((el) => el.remove());
+        } catch {}
+      });
+
+      // 2. Direct body inspection for injected fixed widgets
+      document.querySelectorAll("body > div, body > aside, body > iframe, body > button").forEach((el) => {
+        try {
+          const html = el.outerHTML?.toLowerCase() || "";
+          if (
+            html.includes("lovable") ||
+            html.includes("gpteng") ||
+            html.includes("edit with") ||
+            html.includes("remix")
+          ) {
+            el.remove();
+          }
+        } catch {}
+      });
+    };
+
+    purgeBadges();
+    const interval = setInterval(purgeBadges, 250);
+    const observer = new MutationObserver(purgeBadges);
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      clearInterval(interval);
+      observer.disconnect();
+    };
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
@@ -119,3 +166,4 @@ function RootComponent() {
     </QueryClientProvider>
   );
 }
+

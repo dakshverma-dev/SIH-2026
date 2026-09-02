@@ -157,16 +157,21 @@
 
 /* Hide Lovable badge, widget, and floating tag */
 #lovable-badge,
+#lovable-tag,
+.lovable-badge,
 [id*="lovable"],
 [class*="lovable"],
 [class*="gpteng"],
 [id*="gpteng"],
 a[href*="lovable.dev"],
 button[aria-label*="lovable" i],
+div:has(> a[href*="lovable.dev"]),
+div:has(> button[aria-label*="lovable" i]),
+iframe[src*="lovable.dev"],
 div[style*="z-index: 2147483647"],
 div[style*="z-index: 999999"],
-#lovable-tag,
-.lovable-badge {
+div[style*="position: fixed"][style*="bottom:"][style*="right:"]:has(svg),
+div[style*="position: fixed"][style*="bottom:"][style*="left:"]:has(svg) {
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;
