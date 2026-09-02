@@ -52,13 +52,11 @@ function LoginPage() {
   const useDemo = async (mail: string) => {
     setBusy(true);
     setError(null);
-    setMessage("Preparing demo accounts.");
+    setMessage("Signing in to demo account...");
     try {
       await provision({ data: undefined });
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not prepare the demo accounts.");
-      setBusy(false);
-      return;
+    } catch {
+      // Ignore background server provisioning errors and proceed to sign in directly
     }
     setMessage(null);
     await signIn(mail, DEMO_PASSWORD);
