@@ -35,6 +35,7 @@ cp .env.example .env
 ```
 
 Configure your Supabase credentials:
+
 ```env
 VITE_SUPABASE_URL=https://<your-project>.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=<your-publishable-key>
@@ -57,6 +58,8 @@ npm run build
 
 1. Push your code to GitHub.
 2. Import the repository in [Vercel](https://vercel.com).
-3. Set the Environment Variables (`VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `VITE_SUPABASE_PROJECT_ID`).
+3. Set the Environment Variables (`VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `VITE_SUPABASE_PROJECT_ID`, `VITE_BACKEND_URL`).
 4. Set the build command to `npm run build`.
 5. Deploy!
+
+The frontend is designed for Vercel and the capture API is designed for EC2. See `docs/deployment.md` for the split deployment steps.

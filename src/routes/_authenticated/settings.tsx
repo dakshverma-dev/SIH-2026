@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
+import { backendUrl, fetchBackendHealth } from "@/lib/backend";
 import { supabase } from "@/integrations/supabase/client";
 import { ROLE_LABEL } from "@/lib/domain/permissions";
 import { Field, PageHeader, Panel } from "@/components/kit";
@@ -10,9 +11,16 @@ export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
     meta: [
       { title: "Settings. Plan2Reality" },
-      { name: "description", content: "Extraction provider status, security posture and, for admins, the user and role register." },
+      {
+        name: "description",
+        content:
+          "Extraction provider status, security posture and, for admins, the user and role register.",
+      },
       { property: "og:title", content: "Settings. Plan2Reality" },
-      { property: "og:description", content: "How this deployment is actually configured, stated plainly." },
+      {
+        property: "og:description",
+        content: "How this deployment is actually configured, stated plainly.",
+      },
     ],
   }),
   component: Settings,
@@ -21,8 +29,15 @@ export const Route = createFileRoute("/_authenticated/settings")({
 function Settings() {
   const { role, name, user, can } = useAuth();
   const email = user?.email ?? "";
-  const extractionMode = (import.meta.env["VITE_EXTRACTION_MODE"] as string || "DEMO_FALLBACK");
+  const extractionMode = (import.meta.env["VITE_EXTRACTION_MODE"] as string) || "DEMO_FALLBACK";
   const isAdmin = can("settings:users");
+
+  const backendHealth = useQuery({
+    queryKey: ["backend-health", backendUrl],
+    enabled: Boolean(backendUrl),
+    queryFn: fetchBackendHealth,
+    retry: 1,
+  });
 
   const users = useQuery({
     queryKey: ["users-roles"],
@@ -71,9 +86,34 @@ function Settings() {
               </span>
             </div>
             <p className="text-muted-foreground">
-              The fallback is a deterministic rule based extractor. It is labelled as such everywhere it
-              produces output, so no screen ever claims a model did work it did not do.
+              The fallback is a deterministic rule based extractor. It is labelled as such
+              everywhere it produces output, so no screen ever claims a model did work it did not
+              do.
             </p>
+            <div className="rounded-md border border-border bg-panel-2 p-3">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-muted-foreground">EC2 backend</span>
+                <span className="font-mono text-[11px] text-text-soft">
+                  {backendUrl || "Not configured"}
+                </span>
+              </div>
+              {backendUrl ? (
+                <div className="mt-2 text-xs text-text-soft">
+                  {backendHealth.isLoading ? "Checking backend health..." : null}
+                  {backendHealth.isError ? "Backend health check failed." : null}
+                  {backendHealth.data ? (
+                    <span>
+                      {backendHealth.data.status.toUpperCase()} · DB {backendHealth.data.database} ·{" "}
+                      {backendHealth.data.activities_loaded} activities
+                    </span>
+                  ) : null}
+                </div>
+              ) : (
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Set VITE_BACKEND_URL in Vercel to the EC2 API origin.
+                </p>
+              )}
+            </div>
           </div>
         </Panel>
 
@@ -92,7 +132,9 @@ function Settings() {
           <h2 className="font-serif text-xl">Deterministic guarantees</h2>
           <ul className="mt-4 space-y-2 text-sm text-text-soft">
             <li>Critical path arithmetic is pure code covered by unit tests.</li>
-            <li>Routing between auto post, review and unmatched is decided in the matching layer.</li>
+            <li>
+              Routing between auto post, review and unmatched is decided in the matching layer.
+            </li>
             <li>Every confidence value stores the named signals and weights that produced it.</li>
             <li>An event with no credible counterpart stays unmatched rather than being forced.</li>
           </ul>
